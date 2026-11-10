@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://aryan-island.vercel.app/sitemap.xml
+Sitemap: https://dynamic-pond.vercel.app/sitemap.xml
+
