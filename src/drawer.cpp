@@ -1239,7 +1239,7 @@ LRESULT Drawer::Handle(UINT msg, WPARAM wp, LPARAM lp) {
         return 0;
     case WM_MBUTTONUP: { // middle-click gesture: on closed strip/pill toggles Play/Pause (when track active) or Boosts RAM; on open panel Boosts RAM
         if (!opened && model.hasTrack) {
-            model.media.PlayPause();
+            model.media.TogglePlay();
             Peek(model.track.playing ? L"Paused" : L"Playing", model.track.title.empty() ? L"Media playback" : model.track.title,
                  model.track.playing ? glyph::Pause : glyph::Play);
             return 0;

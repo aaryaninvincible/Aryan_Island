@@ -69,7 +69,7 @@ void Procs(PageCtx& p, const D2D1_RECT_F& r) {
     bool recentBoost = p.m.lastRamCleanTick > 0 && (GetTickCount64() - p.m.lastRamCleanTick < 4000);
     if (recentBoost) p.ui.KeepAlive();
     std::wstring boostLbl = recentBoost ? (L"-" + std::to_wstring((int)std::lround(p.m.lastRamClean.freedMb)) + L" MB") : L"Boost RAM";
-    if (sheet::Act(p.ui, t, Ui::Id("sys.boost.btn"), Rect(r.right - 200, r.top + 10, 88, 26), boostLbl, true, false, true)) {
+    if (sheet::Act(p.ui, t, Ui::Id("sys.boost.btn"), Rect(r.right - 200, r.top + 10, 88, 26), boostLbl.c_str(), true, false, true)) {
         p.m.BoostRam();
     }
     if (sheet::Act(p.ui, t, Ui::Id("sys.sort.btn"), Rect(r.right - 106, r.top + 10, 56, 26), byRam ? L"RAM" : L"CPU", false, false, true)) {
