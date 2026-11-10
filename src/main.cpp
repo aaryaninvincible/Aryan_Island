@@ -438,11 +438,24 @@ LRESULT CALLBACK HostProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
         return 0;
     case WM_APP_UPDATE:
         switch (wp) {
-        case sys::Updater::kInstalled:
+        case sys::Updater::kInstalled: {
             tray::SetUpdate(tray::Upd::Installed, app->updater.Applied());
             app->restartPending = true;
+            std::wstring tag = app->updater.Applied();
+            std::wstring title = L"New Update Installed: " + tag;
+            std::wstring detail = L"Restarting Aryan Island to apply new version " + tag;
+            app->drawer->Peek(title, detail, glyph::Sparkle);
+            Notify(title.c_str(), detail.c_str());
             break;
-        case sys::Updater::kDownloading: tray::SetUpdate(tray::Upd::Downloading, app->updater.Applied()); break;
+        }
+        case sys::Updater::kDownloading: {
+            tray::SetUpdate(tray::Upd::Downloading, app->updater.Applied());
+            std::wstring tag = app->updater.Applied();
+            std::wstring title = L"Downloading Update";
+            std::wstring detail = tag.empty() ? L"Fetching latest release from GitHub..." : (L"Downloading " + tag + L" from GitHub...");
+            app->drawer->Peek(title, detail, glyph::Sparkle);
+            break;
+        }
         case sys::Updater::kCurrent: tray::SetUpdate(tray::Upd::Current); break;
         default: tray::SetUpdate(tray::Upd::Failed); break;
         }
