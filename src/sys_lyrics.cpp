@@ -119,7 +119,7 @@ std::string ToUtf8(const std::wstring& w) {
     return s;
 }
 
-// The disk cache: one small file per song in %LOCALAPPDATA%\Astraeus\lyrics, the newest 300 kept, read and written on the lyrics
+// The disk cache: one small file per song in %LOCALAPPDATA%\Aryan Island\lyrics, the newest 300 kept, read and written on the lyrics
 // thread (a timing nudge writes from the ui, rarely). A song with no lyrics is believed for 3 days, then asked again.
 constexpr size_t kDiskKeep = 300;
 constexpr long long kNoneDays = 3;
@@ -129,7 +129,7 @@ std::wstring DiskDir() {
     wchar_t base[MAX_PATH];
     DWORD n = GetEnvironmentVariableW(L"LOCALAPPDATA", base, MAX_PATH);
     if (!n || n >= MAX_PATH) return {};
-    std::wstring dir = std::wstring(base) + L"\\Astraeus";
+    std::wstring dir = std::wstring(base) + L"\\AryanIsland";
     CreateDirectoryW(dir.c_str(), nullptr);
     dir += L"\\lyrics";
     CreateDirectoryW(dir.c_str(), nullptr);

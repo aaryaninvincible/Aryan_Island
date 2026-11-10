@@ -21,7 +21,7 @@ constexpr size_t kDropMax = 100; // files from one drop: ten stacks of ten
 constexpr UINT kClipDelayMs = 120; // the copying app finishes writing every format first
 constexpr UINT kClipRetryMs = 60;
 constexpr int kClipTries = 5; // another app holds the clipboard open: a few short tries, never a wait on the ui thread
-constexpr wchar_t kClass[] = L"AstraeusShelf";
+constexpr wchar_t kClass[] = L"AryanIslandShelf";
 
 FORMATETC Fmt(CLIPFORMAT cf, LONG index = -1, DWORD tymed = TYMED_HGLOBAL) { return {cf, nullptr, DVASPECT_CONTENT, index, tymed}; }
 

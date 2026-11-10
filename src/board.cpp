@@ -16,7 +16,7 @@
 
 namespace {
 
-constexpr wchar_t kClass[] = L"AstraeusBoard";
+constexpr wchar_t kClass[] = L"AryanIslandBoard";
 constexpr int kMinRows = 4, kMaxRows = 12;
 constexpr double kButtonsSec = 3; // its two buttons show this long after the mouse last moved
 constexpr double kAmbientFps = 12; // music moving on it: enough to look alive, little enough to cost nothing
@@ -85,10 +85,10 @@ Board::Board(Model& m, HMONITOR mon, const std::wstring& screenName) : model(m),
     UINT pw = (UINT)(r.right - r.left), ph = (UINT)(r.bottom - r.top);
     W = pw / scale;
     H = ph / scale;
-    hwnd = CreateWindowExW(WS_EX_TOPMOST | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE | WS_EX_NOREDIRECTIONBITMAP, kClass, L"Astraeus Dashboard", WS_POPUP, r.left, r.top,
+    hwnd = CreateWindowExW(WS_EX_TOPMOST | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE | WS_EX_NOREDIRECTIONBITMAP, kClass, L"Aryan Island Dashboard", WS_POPUP, r.left, r.top,
                            (int)pw, (int)ph, nullptr, nullptr, GetModuleHandleW(nullptr), this); // the whole screen, no taskbar button, never the keyboard's
     if (!hwnd) return;
-    access.Attach(hwnd, L"Astraeus dashboard");
+    access.Attach(hwnd, L"Aryan Island dashboard");
     BOOL off = TRUE;
     DwmSetWindowAttribute(hwnd, DWMWA_TRANSITIONS_FORCEDISABLED, &off, sizeof(off));
     if (!MakeDev(pw, ph)) {

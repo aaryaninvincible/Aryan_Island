@@ -246,7 +246,7 @@ std::string NextId(const std::string& path) { return "next:" + path; }
 
 static std::wstring CalTitle(const Game& g) { return g.solo ? g.a : g.a + L" v " + g.b; } // the one name add, check and remove all match on
 
-bool AddToCalendar(const Game& g, const std::wstring& league) { // into astraeus' own calendar: it shows on its day beside the linked calendars
+bool AddToCalendar(const Game& g, const std::wstring& league) { // into aryan_island' own calendar: it shows on its day beside the linked calendars
     constexpr int64_t kSlotSec = 2 * 3600;
     if (g.when <= 0) return false;
     sys::cal::Event ev;

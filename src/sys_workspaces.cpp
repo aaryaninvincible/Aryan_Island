@@ -385,7 +385,7 @@ struct Workspaces::Impl {
         }
         J doc;
         if (ParseJson(Capture(Quote(cliPath) + L" state"), doc)) TakeTiling(doc);
-        std::wstring name = L"astraeus-ws-" + std::to_wstring(GetCurrentProcessId());
+        std::wstring name = L"aryan-island-ws-" + std::to_wstring(GetCurrentProcessId());
         std::wstring path = L"\\\\.\\pipe\\" + name;
         HANDLE pipe = CreateNamedPipeW(path.c_str(), PIPE_ACCESS_INBOUND | FILE_FLAG_OVERLAPPED, PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT, 1, 0, 1 << 20, 0, nullptr);
         if (pipe != INVALID_HANDLE_VALUE) {
@@ -536,7 +536,7 @@ struct Workspaces::Impl {
     }
 
     void RunTilingWs() {
-        HINTERNET session = WinHttpOpen(L"Astraeus", WINHTTP_ACCESS_TYPE_NO_PROXY, WINHTTP_NO_PROXY_NAME, WINHTTP_NO_PROXY_BYPASS, 0);
+        HINTERNET session = WinHttpOpen(L"Aryan Island", WINHTTP_ACCESS_TYPE_NO_PROXY, WINHTTP_NO_PROXY_NAME, WINHTTP_NO_PROXY_BYPASS, 0);
         HINTERNET conn = session ? WinHttpConnect(session, L"localhost", kTilingWsPort, 0) : nullptr;
         HINTERNET req = conn ? WinHttpOpenRequest(conn, L"GET", L"/", nullptr, WINHTTP_NO_REFERER, WINHTTP_DEFAULT_ACCEPT_TYPES, 0) : nullptr;
         HINTERNET ws = nullptr;

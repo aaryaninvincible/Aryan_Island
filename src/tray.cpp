@@ -160,7 +160,7 @@ void Paint() {
         c.Dot(badge, 16, t.accent.Alpha(0.20f));
         c.Icon(glyph::Sparkle, badge, 18, t.accentHi, true);
     }
-    c.Text(L"Astraeus", Rect(kPad + 48, 12, 180, 18), Weight::Medium, 14, t.text);
+    c.Text(L"Aryan Island", Rect(kPad + 48, 12, 180, 18), Weight::Medium, 14, t.text);
     c.Text(L"Developed by aaryaninvincible", Rect(kPad + 48, 30, 190, 14), Weight::Medium, 10.5f, t.accentHi);
 
     for (int i = 0; i < kCount; ++i) {
@@ -326,7 +326,7 @@ void Show(HWND owner, const Theme& t, bool startup) {
         wc.lpfnWndProc = Proc;
         wc.hInstance = GetModuleHandleW(nullptr);
         wc.hCursor = LoadCursorW(nullptr, IDC_ARROW);
-        wc.lpszClassName = L"AstraeusTray";
+        wc.lpszClassName = L"AryanIslandTray";
         return RegisterClassExW(&wc);
     }();
     if (!cls) return; // class registration failed
@@ -341,14 +341,14 @@ void Show(HWND owner, const Theme& t, bool startup) {
     g->t = t;
     g->startup = startup;
     g->knob = startup ? 1.0f : 0.0f;
-    g->hwnd = CreateWindowExW(WS_EX_TOOLWINDOW | WS_EX_TOPMOST, L"AstraeusTray", L"Astraeus", WS_POPUP, p.x, p.y, 1, 1, owner,
+    g->hwnd = CreateWindowExW(WS_EX_TOOLWINDOW | WS_EX_TOPMOST, L"AryanIslandTray", L"Aryan Island", WS_POPUP, p.x, p.y, 1, 1, owner,
                               nullptr, GetModuleHandleW(nullptr), nullptr);
     if (!g->hwnd) {
         delete g;
         g = nullptr;
         return;
     }
-    g->access.Attach(g->hwnd, L"Astraeus menu");
+    g->access.Attach(g->hwnd, L"Aryan Island menu");
     g->access.Enable(readerNext);
     g->scale = GetDpiForWindow(g->hwnd) / 96.0f * zoomNext; // dpi of the monitor under the cursor, times the text size
     int w = (int)(kW * g->scale + 0.5f), h = (int)(Height() * g->scale + 0.5f);
@@ -427,7 +427,7 @@ void AskPaint() {
     c.Ring(badge, 22, t.accentHi.Alpha(0.35f), 1);
     c.Icon(glyph::Rocket, badge, 24, t.accentHi, true);
     c.Text(L"Start with Windows?", Rect(80, 26, kAskW - 100, 24), Weight::Medium, 17, t.text);
-    c.Text(L"Astraeus (Developed by aaryaninvincible)", Rect(80, 52, kAskW - 100, 18), Weight::Medium, 12, t.accentHi);
+    c.Text(L"Aryan Island (Developed by aaryaninvincible)", Rect(80, 52, kAskW - 100, 18), Weight::Medium, 12, t.accentHi);
     c.Text(L"can open when you sign in, so the island is always ready.", Rect(80, 70, kAskW - 100, 18), Weight::Light, 12, t.textDim); // manual wrap
     for (int i = 0; i < 2; ++i) {
         D2D1_RECT_F r = AskBtn(i);
@@ -517,7 +517,7 @@ void Ask(HWND owner, const Theme& t) {
         wc.lpfnWndProc = AskProc;
         wc.hInstance = GetModuleHandleW(nullptr);
         wc.hCursor = LoadCursorW(nullptr, IDC_ARROW);
-        wc.lpszClassName = L"AstraeusAsk";
+        wc.lpszClassName = L"AryanIslandAsk";
         return RegisterClassExW(&wc);
     }();
     if (!cls) return;
@@ -528,7 +528,7 @@ void Ask(HWND owner, const Theme& t) {
     q = new Prompt();
     q->owner = owner;
     q->t = t;
-    q->hwnd = CreateWindowExW(WS_EX_TOOLWINDOW | WS_EX_TOPMOST, L"AstraeusAsk", L"Astraeus", WS_POPUP, mi.rcWork.left,
+    q->hwnd = CreateWindowExW(WS_EX_TOOLWINDOW | WS_EX_TOPMOST, L"AryanIslandAsk", L"Aryan Island", WS_POPUP, mi.rcWork.left,
                               mi.rcWork.top, 1, 1, owner, nullptr, GetModuleHandleW(nullptr), nullptr);
     if (!q->hwnd) {
         delete q;

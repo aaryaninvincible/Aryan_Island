@@ -3,7 +3,7 @@
 namespace sys {
 
 namespace {
-constexpr wchar_t kRegKey[] = L"Software\\Astraeus"; // HKCU settings root
+constexpr wchar_t kRegKey[] = L"Software\\AryanIsland"; // HKCU settings root
 }
 
 bool ReadFlag(const wchar_t* name, bool fallback) {

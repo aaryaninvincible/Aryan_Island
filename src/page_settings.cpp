@@ -724,7 +724,7 @@ void DrawSettings(PageCtx& p, float k) {
     D2D1_RECT_F grid;
     if (!frame.tall) { // hero column: the color orb
         float hx = s.left + kHero / 2;
-        c.Text(std::wstring(L"Astraeus  ·  ") + APP_VER_W, Rect(s.left + 10, s.top + 10, kHero - 20, 15), Weight::Medium, 12, t.textDim, Align::Center);
+        c.Text(std::wstring(L"Aryan Island  ·  ") + APP_VER_W, Rect(s.left + 10, s.top + 10, kHero - 20, 15), Weight::Medium, 12, t.textDim, Align::Center);
         c.Text(L"Developed by aaryaninvincible", Rect(s.left + 10, s.top + 25, kHero - 20, 14), Weight::Medium, 10.5f, t.accentHi, Align::Center);
         if (m.look == 3) { // custom: any accent and any background, straight off the wheel
             Wheel(p, {hx, s.top + 98}, 62, live);

@@ -56,7 +56,7 @@ void SetFollowed(const std::vector<std::string>& paths);
 constexpr size_t kMaxFollowed = 3;
 std::string FeedId(const std::string& path); // "sport:soccer/eng.1": now and lately
 std::string NextId(const std::string& path); // "next:soccer/eng.1": the past week's results and the coming days
-bool AddToCalendar(const Game& g, const std::wstring& league); // into astraeus' own calendar, on the game's day
+bool AddToCalendar(const Game& g, const std::wstring& league); // into aryan_island' own calendar, on the game's day
 bool InCalendar(const Game& g); // added already: the panel offers remove instead
 bool RemoveFromCalendar(const Game& g);
 

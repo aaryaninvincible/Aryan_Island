@@ -11,7 +11,7 @@
 
 namespace {
 
-constexpr wchar_t kClass[] = L"AstraeusStage";
+constexpr wchar_t kClass[] = L"AryanIslandStage";
 constexpr float kPi = 3.14159265f;
 constexpr float kStageArtSigma = 6; // the album art background at 1024 px: softened, the cover clearly itself
 constexpr float kStageArtGlass = 0.6f; // glass keeps some of the desktop showing through it
@@ -129,10 +129,10 @@ Stage::Stage(Model& m, HMONITOR mon, bool focus) : model(m), mode(m.Glassy() ? 2
     UINT pw = (UINT)(r.right - r.left), ph = (UINT)(r.bottom - r.top);
     W = pw / scale;
     H = ph / scale;
-    hwnd = CreateWindowExW(WS_EX_TOPMOST | WS_EX_TOOLWINDOW | WS_EX_NOREDIRECTIONBITMAP, kClass, L"Astraeus", WS_POPUP, r.left, r.top, (int)pw, (int)ph,
+    hwnd = CreateWindowExW(WS_EX_TOPMOST | WS_EX_TOOLWINDOW | WS_EX_NOREDIRECTIONBITMAP, kClass, L"Aryan Island", WS_POPUP, r.left, r.top, (int)pw, (int)ph,
                            nullptr, nullptr, GetModuleHandleW(nullptr), this);
     if (!hwnd || !MakeDev(pw, ph)) return;
-    access.Attach(hwnd, L"Astraeus fullscreen player");
+    access.Attach(hwnd, L"Aryan Island fullscreen player");
     access.Enable(model.a11yReader != 0);
     ShowWindow(hwnd, focus ? SW_SHOW : SW_SHOWNA); // the second of a pair shows without taking the keyboard
     if (focus) SetForegroundWindow(hwnd); // keys work right away: esc, space, arrows

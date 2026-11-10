@@ -48,7 +48,7 @@ constexpr uint64_t kHoldMs = 3000; // a player pausing between songs isn't done:
 
 void Log(const wchar_t* where, const wchar_t* what) noexcept {
     wchar_t buf[512];
-    swprintf_s(buf, L"[Astraeus/media] %ls: %ls\n", where, what ? what : L""); // truncates safely
+    swprintf_s(buf, L"[AryanIsland/media] %ls: %ls\n", where, what ? what : L""); // truncates safely
     OutputDebugStringW(buf);
 }
 

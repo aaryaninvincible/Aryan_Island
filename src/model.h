@@ -112,7 +112,7 @@ public:
     void SetAwake(bool on);
     void SetLook(int look); // appearance: 0 dark, 1 light, 2 glass, 3 custom, 4 halobar's; persisted
     void SetPref(int& field, const wchar_t* key, int value); // store a settings value and remember it
-    void OpenSettings(); // astraeus settings sheet, one sheet at a time
+    void OpenSettings(); // aryan_island settings sheet, one sheet at a time
     void PickScreen(const std::wstring& name); // live on this screen only
     void CloseSettings();
     void OpenCal(); // the calendar sheet, from the weather card
@@ -473,7 +473,7 @@ public:
     int appKeyOnly = 0; // an app window under the edge: hovering opens nothing, only the shortcut does
     static constexpr int kAppHoverMs = 500, kAppHoverMax = 1000, kAppHoverStep = 50; // the dwell over an app window: default, most, slider step
     int appHoverMs = kAppHoverMs; // how long the mouse rests at the edge over an app before the pill drops
-    int hud = 0; // astraeus' own volume and brightness pill, experimental, off by default
+    int hud = 0; // aryan_island' own volume and brightness pill, experimental, off by default
     int vizWave = 0; // the media page and fullscreen draw a waveform across, behind the art, instead of the soft glow
     int vizFull = 0; // the visualizer ignores how loud windows plays: quiet music still moves it
 

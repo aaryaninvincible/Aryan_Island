@@ -63,7 +63,7 @@ std::wstring LogTail() {
     DWORD len = GetModuleFileNameW(nullptr, exe, MAX_PATH);
     if (!len || len >= MAX_PATH) return L"";
     std::wstring path = exe;
-    path = path.substr(0, path.find_last_of(L'\\')) + L"\\astraeus.log";
+    path = path.substr(0, path.find_last_of(L'\\')) + L"\\aryan_island.log";
     HANDLE f = CreateFileW(path.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, 0, nullptr);
     if (f == INVALID_HANDLE_VALUE) return L"";
     LARGE_INTEGER size{};
@@ -150,7 +150,7 @@ std::wstring LogPick(const std::wstring& log) {
 }
 
 std::wstring ProblemReport() {
-    std::wstring s = L"Astraeus problem report\r\nVersion: " APP_VER_W L"\r\n" + Pc() + L"\r\nSettings:\r\n";
+    std::wstring s = L"Aryan Island problem report\r\nVersion: " APP_VER_W L"\r\n" + Pc() + L"\r\nSettings:\r\n";
     for (const wchar_t* name : kShared) {
         int v = ReadNum(name, kUnset);
         if (v != kUnset) s += std::wstring(L"  ") + name + L" = " + std::to_wstring(v) + L"\r\n";

@@ -1,6 +1,6 @@
 // The widgets page: a bento board of small, wide and large tiles that pack together with no holes.
 // They're arranged and added to in the studio: the same stage as the long pill's editor, the board over the wallpaper and a gallery of live previews popped out under it.
-// Everything here is Astraeus' own: nothing asks HaloBar for anything.
+// Everything here is Aryan Island' own: nothing asks HaloBar for anything.
 #include <algorithm>
 #include <cmath>
 #include <cstring>

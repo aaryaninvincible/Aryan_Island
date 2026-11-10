@@ -33,12 +33,12 @@ constexpr DWORD kBootWaitMs = 3000;
 constexpr DWORD kTaskGoneMs = 2000; // long enough for the scheduler to take the task away before this short-lived launch ends
 constexpr unsigned kShellFastTicks = 120; // tray icon and fullscreen notices: retried every second for two minutes, then every half minute
 constexpr unsigned kShellSlowTicks = 30;
-constexpr LONGLONG kLogMax = 256 << 10; // astraeus.log starts over past this
+constexpr LONGLONG kLogMax = 256 << 10; // aryan_island.log starts over past this
 constexpr UINT_PTR kMixTimer = 3; // the mixer's meters and ducking, only while they need it
 constexpr UINT kMixMs = 100;
 constexpr int kMixIcon = 0xE429; // the banner's mark: tune
 constexpr int kMixKeyId = 0x4D00; // the mixer's shortcuts, Model::kMixKeys ids from here
-constexpr UINT_PTR kIniTimer = 2; // astraeus.ini changed: read it once the editor is done writing
+constexpr UINT_PTR kIniTimer = 2; // aryan_island.ini changed: read it once the editor is done writing
 constexpr UINT kIniSettleMs = 300;
 constexpr int kIniTries = 20; // ~6 s of a file that can't be opened, then it waits for the next change
 using namespace tray; // menu command ids
@@ -63,14 +63,14 @@ struct App {
     unsigned ticks = 0; // seconds since launch, schedules update checks
     bool restartPending = false; // new exe swapped in, restart once idle
     HANDLE iniWatch = INVALID_HANDLE_VALUE; // the exe's folder, told when a file in it is written
-    FILETIME iniTime{}; // astraeus.ini as last read
+    FILETIME iniTime{}; // aryan_island.ini as last read
     int iniTries = 0; // reads put off because the file couldn't be opened
 };
 
 App* app = nullptr; // global so window procs can reach it
 
 void Log(const std::wstring& s) {
-    std::wstring line = s + L"\r\n", path = app->dir + L"\\astraeus.log";
+    std::wstring line = s + L"\r\n", path = app->dir + L"\\aryan_island.log";
     WIN32_FILE_ATTRIBUTE_DATA fa;
     if (GetFileAttributesExW(path.c_str(), GetFileExInfoStandard, &fa) && (((LONGLONG)fa.nFileSizeHigh << 32) | fa.nFileSizeLow) > kLogMax)
         MoveFileExW(path.c_str(), (path + L".old").c_str(), MOVEFILE_REPLACE_EXISTING); // one generation kept, never grows without end
@@ -84,10 +84,10 @@ void Log(const std::wstring& s) {
     CloseHandle(f);
 }
 
-std::wstring InstallDir() { // %LOCALAPPDATA%\Programs\Astraeus, per-user, no admin needed
+std::wstring InstallDir() { // %LOCALAPPDATA%\Programs\Aryan Island, per-user, no admin needed
     wchar_t* base = nullptr;
     std::wstring dir;
-    if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_UserProgramFiles, 0, nullptr, &base))) dir = std::wstring(base) + L"\\Astraeus";
+    if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_UserProgramFiles, 0, nullptr, &base))) dir = std::wstring(base) + L"\\AryanIsland";
     CoTaskMemFree(base);
     return dir;
 }
@@ -104,37 +104,32 @@ bool Install(const std::wstring& dst) { // copy the exe (fonts are inside it) so
     if (dst.empty()) return false;
     int r = SHCreateDirectoryExW(nullptr, dst.c_str(), nullptr); // creates parents too
     if (r != ERROR_SUCCESS && r != ERROR_ALREADY_EXISTS && r != ERROR_FILE_EXISTS) return false;
-    if (!CopyIfChanged(app->exePath, dst + L"\\Astraeus.exe")) return false;
-    DeleteFileW((dst + L"\\Astraeus.exe:Zone.Identifier").c_str()); // the download's internet mark came along with the copy: at sign-in windows may hold it for a security prompt nobody sees
-    std::wstring ini = dst + L"\\astraeus.ini";
+    if (!CopyIfChanged(app->exePath, dst + L"\\AryanIsland.exe")) return false;
+    DeleteFileW((dst + L"\\AryanIsland.exe:Zone.Identifier").c_str()); // the download's internet mark came along with the copy: at sign-in windows may hold it for a security prompt nobody sees
+    std::wstring ini = dst + L"\\aryan_island.ini";
     if (GetFileAttributesW(ini.c_str()) == INVALID_FILE_ATTRIBUTES) CopyFileW(app->cfgPath.c_str(), ini.c_str(), TRUE); // carry settings over once, never clobber
     return true;
 }
 
-void UndoRename() { // 1.2.11 called itself astraeus island for a day: its startup entry, its switch and its shortcut go back to plain astraeus
-    constexpr const wchar_t* kRenamed = L"Astraeus Island";
+void UndoRename() { // legacy startup entry cleanup
+    constexpr const wchar_t* kRenamed = L"AryanIsland_Legacy";
     wchar_t value[MAX_PATH * 2];
     DWORD size = sizeof(value);
     if (RegGetValueW(HKEY_CURRENT_USER, kRunKey, kRenamed, RRF_RT_REG_SZ, nullptr, value, &size) == ERROR_SUCCESS) {
-        RegSetKeyValueW(HKEY_CURRENT_USER, kRunKey, L"Astraeus", REG_SZ, value, size);
+        RegSetKeyValueW(HKEY_CURRENT_USER, kRunKey, L"Aryan Island", REG_SZ, value, size);
         BYTE flags[12] = {};
         DWORD fsize = sizeof(flags);
         if (RegGetValueW(HKEY_CURRENT_USER, kApprovedKey, kRenamed, RRF_RT_REG_BINARY, nullptr, flags, &fsize) == ERROR_SUCCESS)
-            RegSetKeyValueW(HKEY_CURRENT_USER, kApprovedKey, L"Astraeus", REG_BINARY, flags, fsize); // on or off, as the user left it
+            RegSetKeyValueW(HKEY_CURRENT_USER, kApprovedKey, L"Aryan Island", REG_BINARY, flags, fsize); // on or off, as the user left it
         RegDeleteKeyValueW(HKEY_CURRENT_USER, kRunKey, kRenamed);
         RegDeleteKeyValueW(HKEY_CURRENT_USER, kApprovedKey, kRenamed);
-    }
-    PWSTR programs = nullptr;
-    if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_Programs, 0, nullptr, &programs))) {
-        DeleteFileW((std::wstring(programs) + L"\\Astraeus Island.lnk").c_str()); // StartShortcut writes the plain one
-        CoTaskMemFree(programs);
     }
 }
 
 std::wstring BootExe() { // exe the run key launches at sign-in, unquoted, empty if none
     wchar_t value[MAX_PATH * 2];
     DWORD size = sizeof(value);
-    if (RegGetValueW(HKEY_CURRENT_USER, kRunKey, L"Astraeus", RRF_RT_REG_SZ, nullptr, value, &size) != ERROR_SUCCESS) return L"";
+    if (RegGetValueW(HKEY_CURRENT_USER, kRunKey, L"Aryan Island", RRF_RT_REG_SZ, nullptr, value, &size) != ERROR_SUCCESS) return L"";
     std::wstring v = value;
     if (v.size() >= 2 && v.front() == L'"') v = v.substr(1, v.find(L'"', 1) - 1); // strip quotes
     return v;
@@ -145,43 +140,43 @@ bool StartupOn() { // any existing copy counts, wherever it lives
     if (exe.empty() || GetFileAttributesW(exe.c_str()) == INVALID_FILE_ATTRIBUTES) return false; // no entry, or exe deleted
     BYTE flags[12] = {};
     DWORD size = sizeof(flags);
-    if (RegGetValueW(HKEY_CURRENT_USER, kApprovedKey, L"Astraeus", RRF_RT_REG_BINARY, nullptr, flags, &size) == ERROR_SUCCESS)
+    if (RegGetValueW(HKEY_CURRENT_USER, kApprovedKey, L"Aryan Island", RRF_RT_REG_BINARY, nullptr, flags, &size) == ERROR_SUCCESS)
         return (flags[0] & 1) == 0; // settings > startup toggle: odd first byte = disabled
     return true;
 }
 
 void SetBoot(const std::wstring& exe) { // point the run key at exe and clear any settings disable
     std::wstring cmd = L"\"" + exe + L"\" " + kBootArg; // quoted for paths with spaces
-    RegSetKeyValueW(HKEY_CURRENT_USER, kRunKey, L"Astraeus", REG_SZ, cmd.c_str(), (DWORD)((cmd.size() + 1) * sizeof(wchar_t)));
+    RegSetKeyValueW(HKEY_CURRENT_USER, kRunKey, L"Aryan Island", REG_SZ, cmd.c_str(), (DWORD)((cmd.size() + 1) * sizeof(wchar_t)));
     BYTE flags[12] = {2}; // 2 = enabled
-    RegSetKeyValueW(HKEY_CURRENT_USER, kApprovedKey, L"Astraeus", REG_BINARY, flags, sizeof(flags));
+    RegSetKeyValueW(HKEY_CURRENT_USER, kApprovedKey, L"Aryan Island", REG_BINARY, flags, sizeof(flags));
 }
 
-void SyncLogon() { sys::LogonTask(L"Astraeus", BootExe(), std::wstring(kBootArg) + L" " + kLogonArg, StartupOn()); } // follows the startup entry, task manager's switch included
+void SyncLogon() { sys::LogonTask(L"Aryan Island", BootExe(), std::wstring(kBootArg) + L" " + kLogonArg, StartupOn()); } // follows the startup entry, task manager's switch included
 
 void Restart(const std::wstring& exe);
 void SetStartup(bool on) {
     std::wstring dst = InstallDir();
     if (!on) {
-        RegDeleteKeyValueW(HKEY_CURRENT_USER, kRunKey, L"Astraeus");
+        RegDeleteKeyValueW(HKEY_CURRENT_USER, kRunKey, L"Aryan Island");
         SyncLogon();
         return;
     }
     if (!Install(dst)) { // nothing safe to point at
-        Log(L"Could not copy Astraeus to " + dst);
+        Log(L"Could not copy Aryan Island to " + dst);
         return;
     }
-    SetBoot(dst + L"\\Astraeus.exe");
+    SetBoot(dst + L"\\AryanIsland.exe");
     SyncLogon();
-    if (_wcsicmp(app->dir.c_str(), dst.c_str()) != 0) Restart(dst + L"\\Astraeus.exe"); // switch over to the installed copy
+    if (_wcsicmp(app->dir.c_str(), dst.c_str()) != 0) Restart(dst + L"\\AryanIsland.exe"); // switch over to the installed copy
 }
 
-void StartShortcut() { // a shortcut in the start menu, so astraeus can be found again after it's closed; rewritten only when it points somewhere else
+void StartShortcut() { // a shortcut in the start menu, so aryan_island can be found again after it's closed; rewritten only when it points somewhere else
     PWSTR programs = nullptr;
     if (FAILED(SHGetKnownFolderPath(FOLDERID_Programs, 0, nullptr, &programs))) return;
-    std::wstring lnk = std::wstring(programs) + L"\\Astraeus.lnk";
+    std::wstring lnk = std::wstring(programs) + L"\\Aryan Island.lnk";
     CoTaskMemFree(programs);
-    std::wstring target = app->exePath, inst = InstallDir() + L"\\Astraeus.exe";
+    std::wstring target = app->exePath, inst = InstallDir() + L"\\AryanIsland.exe";
     if (_wcsicmp(BootExe().c_str(), inst.c_str()) == 0 && GetFileAttributesW(inst.c_str()) != INVALID_FILE_ATTRIBUTES) target = inst; // the copy that starts with windows and gets updated
     Microsoft::WRL::ComPtr<IShellLinkW> link;
     Microsoft::WRL::ComPtr<IPersistFile> file;
@@ -192,7 +187,7 @@ void StartShortcut() { // a shortcut in the start menu, so astraeus can be found
     std::wstring dir = target.substr(0, target.find_last_of(L'\\'));
     link->SetPath(target.c_str());
     link->SetWorkingDirectory(dir.c_str());
-    link->SetDescription(L"Astraeus");
+    link->SetDescription(L"Aryan Island");
     link->SetIconLocation(target.c_str(), 0);
     file->Save(lnk.c_str(), TRUE);
 }
@@ -200,15 +195,15 @@ void StartShortcut() { // a shortcut in the start menu, so astraeus can be found
 void MarkBoot() { // entries written before the greeting existed get the flag once
     wchar_t value[MAX_PATH * 2];
     DWORD size = sizeof(value);
-    if (RegGetValueW(HKEY_CURRENT_USER, kRunKey, L"Astraeus", RRF_RT_REG_SZ, nullptr, value, &size) != ERROR_SUCCESS) return;
+    if (RegGetValueW(HKEY_CURRENT_USER, kRunKey, L"Aryan Island", RRF_RT_REG_SZ, nullptr, value, &size) != ERROR_SUCCESS) return;
     std::wstring v = value;
     if (v.empty() || v.front() != L'"' || v.find(kBootArg) != std::wstring::npos) return; // unquoted: a path with words after it wouldn't parse
     v = v + L" " + kBootArg;
-    RegSetKeyValueW(HKEY_CURRENT_USER, kRunKey, L"Astraeus", REG_SZ, v.c_str(), (DWORD)((v.size() + 1) * sizeof(wchar_t))); // startup approval untouched: on or off as the user left it
+    RegSetKeyValueW(HKEY_CURRENT_USER, kRunKey, L"Aryan Island", REG_SZ, v.c_str(), (DWORD)((v.size() + 1) * sizeof(wchar_t))); // startup approval untouched: on or off as the user left it
 }
 
 void SyncBoot() { // launch-time housekeeping once startup is known to be on
-    std::wstring dst = InstallDir(), inst = dst + L"\\Astraeus.exe", boot = BootExe();
+    std::wstring dst = InstallDir(), inst = dst + L"\\AryanIsland.exe", boot = BootExe();
     if (_wcsicmp(app->dir.c_str(), dst.c_str()) == 0) { // we are the installed copy
         DeleteFileW((app->exePath + L":Zone.Identifier").c_str()); // copies installed before this kept the download's mark
         return;
@@ -277,7 +272,7 @@ void AddTray() {
     nid.uFlags = NIF_MESSAGE | NIF_TIP;
     nid.uCallbackMessage = WM_APP_TRAY; // clicks come back to HostProc
     SetTrayIcon(nid);
-    wcscpy_s(nid.szTip, L"Astraeus · Developed by aaryaninvincible");
+    wcscpy_s(nid.szTip, L"Aryan Island · Developed by aaryaninvincible");
     app->trayOn = Shell_NotifyIconW(NIM_ADD, &nid) || Shell_NotifyIconW(NIM_MODIFY, &nid); // already there (a tray host's re-add call): kept as it is
 }
 
@@ -348,7 +343,7 @@ FILETIME IniTime() {
     return fa.ftLastWriteTime;
 }
 
-void ReloadIni() { // astraeus.ini was saved: read it again, no restart needed
+void ReloadIni() { // aryan_island.ini was saved: read it again, no restart needed
     FILETIME now = IniTime();
     if (CompareFileTime(&now, &app->iniTime) == 0) return; // the log or another file in the folder, not the config
     HANDLE probe = CreateFileW(app->cfgPath.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, nullptr, OPEN_EXISTING, 0, nullptr);
@@ -367,7 +362,7 @@ void ReloadIni() { // astraeus.ini was saved: read it again, no restart needed
         if (app->cfg.hotKey && !RegisterHotKey(app->host, kHotId, app->cfg.hotMods | MOD_NOREPEAT, app->cfg.hotKey)) Log(L"The shortcut is taken by another app");
     }
     if (app->drawer) app->drawer->Reconfig();
-    Log(L"Reloaded astraeus.ini");
+    Log(L"Reloaded aryan_island.ini");
 }
 
 void Restart(const std::wstring& exe) {
@@ -498,9 +493,9 @@ bool CreateHost(HINSTANCE instance) {
     WNDCLASSEXW wc = {sizeof(wc)};
     wc.lpfnWndProc = HostProc;
     wc.hInstance = instance;
-    wc.lpszClassName = L"AstraeusHost";
+    wc.lpszClassName = L"AryanIslandHost";
     RegisterClassExW(&wc);
-    app->host = CreateWindowExW(WS_EX_TOOLWINDOW, wc.lpszClassName, L"Astraeus", WS_POPUP, 0, 0, 0, 0, nullptr, nullptr, instance, nullptr); // invisible, no taskbar button
+    app->host = CreateWindowExW(WS_EX_TOOLWINDOW, wc.lpszClassName, L"Aryan Island", WS_POPUP, 0, 0, 0, 0, nullptr, nullptr, instance, nullptr); // invisible, no taskbar button
     if (!app->host) return false;
     app->tbMsg = RegisterWindowMessageW(L"TaskbarCreated"); // broadcast when explorer restarts
     ChangeWindowMessageFilterEx(app->host, WM_COMMAND, MSGFLT_ALLOW, nullptr); // halobar's cover and a second launch reach us even across integrity levels
@@ -510,7 +505,7 @@ bool CreateHost(HINSTANCE instance) {
     if (!app->trayOn || !app->appbar) Log(L"Shell not ready at start, retrying");
     SetCoalescableTimer(app->host, kSecTimer, 1000, nullptr, 250); // 1s tick drives model
     if (app->cfg.hotKey && !RegisterHotKey(app->host, kHotId, app->cfg.hotMods | MOD_NOREPEAT, app->cfg.hotKey)) // windows tells us when it's pressed, nothing polls
-        Log(L"The shortcut is taken by another app; set another with hotkey = in astraeus.ini");
+        Log(L"The shortcut is taken by another app; set another with hotkey = in aryan_island.ini");
     return true;
 }
 
@@ -527,7 +522,7 @@ void DestroyHost() {
 
 wchar_t crashLog[MAX_PATH] = {}; // filled at start: the crash handler mustn't build strings
 
-LONG WINAPI Crashed(EXCEPTION_POINTERS* ep) { // the reason goes to astraeus.log, so a start that died at sign-in can be told apart from one that never ran
+LONG WINAPI Crashed(EXCEPTION_POINTERS* ep) { // the reason goes to aryan_island.log, so a start that died at sign-in can be told apart from one that never ran
     HANDLE f = crashLog[0] ? CreateFileW(crashLog, FILE_APPEND_DATA, FILE_SHARE_READ, nullptr, OPEN_ALWAYS, 0, nullptr) : INVALID_HANDLE_VALUE;
     if (f == INVALID_HANDLE_VALUE) return EXCEPTION_CONTINUE_SEARCH;
     HMODULE mod = nullptr;
@@ -571,7 +566,7 @@ void Run() {
         if (dash) waits[n++] = dash;
         HANDLE pill = d.DeskNeeds() ? d.DeskWait() : nullptr; // the desktop pill, only while it has something to draw
         if (pill) waits[n++] = pill;
-        if (app->iniWatch != INVALID_HANDLE_VALUE) waits[n++] = app->iniWatch; // a write to astraeus.ini wakes us, nothing polls it
+        if (app->iniWatch != INVALID_HANDLE_VALUE) waits[n++] = app->iniWatch; // a write to aryan_island.ini wakes us, nothing polls it
         constexpr DWORD kPillPatienceMs = 250; // the pill's editor covers the screen: a signal that never comes must not leave it frozen there
         DWORD r = MsgWaitForMultipleObjectsEx(n, n ? waits : nullptr, pill ? kPillPatienceMs : INFINITE, QS_ALLINPUT, MWMO_INPUTAVAILABLE); // sleep until vsync or input, 0 cpu idle
         if (r < WAIT_OBJECT_0 + n && waits[r - WAIT_OBJECT_0] == app->iniWatch) { // the folder changed: settle, then look at the ini
@@ -599,13 +594,13 @@ int WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int) {
     const wchar_t* line = GetCommandLineW();
     bool boot = wcsstr(line, kBootArg) != nullptr;
     if (wcsstr(line, kLogonArg) && !StartupOn()) { // the logon task, after task manager's switch went off: nothing to start, and no task next time
-        sys::LogonTask(L"Astraeus", L"", L"", false);
+        sys::LogonTask(L"Aryan Island", L"", L"", false);
         Sleep(kTaskGoneMs);
         return 0;
     }
-    HANDLE mutex = CreateMutexW(nullptr, FALSE, L"Local\\Astraeus.Native");
+    HANDLE mutex = CreateMutexW(nullptr, FALSE, L"Local\\AryanIsland.Native");
     if (!mutex || WaitForSingleObject(mutex, boot ? 0 : 3000) == WAIT_TIMEOUT) { // wait for old instance on restart, else bail; the second of the logon task and the startup entry just leaves, at once
-        if (HWND running = boot ? nullptr : FindWindowW(L"AstraeusHost", nullptr)) PostMessageW(running, WM_COMMAND, tray::kWake, 0); // opened by hand while it runs: that one shows itself
+        if (HWND running = boot ? nullptr : FindWindowW(L"AryanIslandHost", nullptr)) PostMessageW(running, WM_COMMAND, tray::kWake, 0); // opened by hand while it runs: that one shows itself
         return 0;
     }
     if (FAILED(OleInitialize(nullptr))) return 1; // an sta for wic and the shell, plus ole for the shelf's drag and drop
@@ -619,10 +614,10 @@ int WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int) {
     state.exePath = exe;
     PathRemoveFileSpecW(exe);
     state.dir = exe;
-    state.cfgPath = state.dir + L"\\astraeus.ini";
+    state.cfgPath = state.dir + L"\\aryan_island.ini";
     state.cfg = Config::Load(state.cfgPath);
     for (const auto& w : state.cfg.warns) Log(w); // bad ini keys go to log
-    wcscpy_s(crashLog, (state.dir + L"\\astraeus.log").c_str());
+    wcscpy_s(crashLog, (state.dir + L"\\aryan_island.log").c_str());
     Log(L"Start " APP_VER_W L", " + std::to_wstring(GetTickCount64() / 1000) + L" s after boot, " + state.exePath); // one line a launch: a start at sign-in that never showed still leaves this
 
     if (!Boot(L"Graphics initialisation", [&] { return gfx::Init(state.dir + L"\\fonts"); })) return 1; // shared d2d/dwrite factories + bundled fonts
@@ -647,12 +642,12 @@ int WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int) {
     if (boot) state.drawer->Greet(); // started with windows: the home page says hello until the mouse moves
     StartShortcut(); // after the boot copy is settled, so the shortcut points at it
     if (sys::FinishUpdate()) { // first run after a swap
-        if (!state.model->quiet) state.drawer->Peek(L"Astraeus updated", L"Now on version " APP_VER_W, glyph::Sparkle); // do not disturb: the tray still says so
+        if (!state.model->quiet) state.drawer->Peek(L"Aryan Island updated", L"Now on version " APP_VER_W, glyph::Sparkle); // do not disturb: the tray still says so
         tray::SetUpdate(tray::Upd::Updated); // the tray says so too until the next check
     }
     gfx::GiveBack(); // trim startup memory
     state.iniTime = IniTime();
-    state.iniWatch = FindFirstChangeNotificationW(state.dir.c_str(), FALSE, FILE_NOTIFY_CHANGE_LAST_WRITE); // edits to astraeus.ini apply live
+    state.iniWatch = FindFirstChangeNotificationW(state.dir.c_str(), FALSE, FILE_NOTIFY_CHANGE_LAST_WRITE); // edits to aryan_island.ini apply live
 
     Run();
 

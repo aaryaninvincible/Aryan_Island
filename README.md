@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="./.github/assets/logo.png" width="120" alt="Astraeus logo" />
+<img src="./.github/assets/logo.png" width="120" alt="Aryan Island logo" />
 
-# Astraeus — Liquid Glass Edition
+# Aryan Island — Liquid Glass Edition
 
 **A native Apple iOS / VisionOS Liquid Glass dynamic island for Windows that drips open from the edge of your screen.**
 
@@ -10,12 +10,12 @@
 
 ![Developer](https://img.shields.io/badge/Developed%20by-aaryaninvincible-FF7300?style=flat-square&logo=github)
 ![Design](https://img.shields.io/badge/Design-Portfolio%20Liquid%20Glass-00F3FF?style=flat-square)
-[![Latest release](https://img.shields.io/github/v/release/Icetist/Astraeus?style=flat-square&color=FF7300)](https://github.com/Icetist/Astraeus/releases/latest)
+[![Latest release](https://img.shields.io/github/v/release/aaryaninvincible/Aryan_Island?style=flat-square&color=FF7300)](https://github.com/aaryaninvincible/Aryan_Island/releases/latest)
 ![Platform](https://img.shields.io/badge/platform-Windows%2010%20%7C%2011-0078D4?style=flat-square&logo=windows)
 ![C++20](https://img.shields.io/badge/C%2B%2B-20-00599C?style=flat-square&logo=cplusplus)
 ![License](https://img.shields.io/badge/license-GPL--3.0-FF7300?style=flat-square)
 
-### [Download Astraeus.exe](https://github.com/Icetist/Astraeus/releases/latest)
+### [Download AryanIsland.exe](https://github.com/aaryaninvincible/Aryan_Island/releases/latest)
 
 <sub>One file for Windows 10 and 11. No installer, no runtime. See [Installation](#-installation) for the SmartScreen warning.</sub>
 
@@ -28,15 +28,15 @@
 [Building](#%EF%B8%8F-building-from-source) •
 [FAQ](#-faq)
 
-<img src="./.github/assets/screenshots/home.png" width="100%" alt="Astraeus dropdown in a custom red look, showing the media player, weather, quick toggles and live system stats" />
+<img src="./.github/assets/screenshots/home.png" width="100%" alt="Aryan Island dropdown in a custom red look, showing the media player, weather, quick toggles and live system stats" />
 
 </div>
 
-Astraeus is a dashboard that lives in a thin strip along the edge of your screen: at the top by default, or as a sidebar on the left or right. Rest the mouse on the middle of that edge, or press **Win+Alt+A**, and a liquid panel springs out with your music, quick toggles, system stats and everyday tools. Move away and it tucks itself back in, hands the GPU back and goes back to using almost nothing. Over a maximized window it shows a small pill instead of the whole panel, and it hides while a game or video runs fullscreen.
+Aryan Island is a dashboard that lives in a thin strip along the edge of your screen: at the top by default, or as a sidebar on the left or right. Rest the mouse on the middle of that edge, or press **Win+Alt+A**, and a liquid panel springs out with your music, quick toggles, system stats and everyday tools. Move away and it tucks itself back in, hands the GPU back and goes back to using almost nothing. Over a maximized window it shows a small pill instead of the whole panel, and it hides while a game or video runs fullscreen.
 
 No Electron, no web view, no runtime to install. Just one small native executable written in C++20 with Direct2D and DirectComposition.
 
-<p align="center"><sub>If Astraeus makes your desktop a little nicer, consider leaving a ⭐. It genuinely helps.</sub></p>
+<p align="center"><sub>If Aryan Island makes your desktop a little nicer, consider leaving a ⭐. It genuinely helps.</sub></p>
 
 ## ✨ Features
 
@@ -55,22 +55,22 @@ No Electron, no web view, no runtime to install. Just one small native executabl
 - **The shelf.** Drag files or text onto the top of the screen (or the open panel) and the panel drops open on the Shelf page to keep them, up to ten, newest first. Drag a card back out to drop it anywhere, or tap it to copy it: a note's text, or the file itself. Only paths are kept, never copies, and nothing touches the disk unless you switch on **Keep after restart**.
 - **Shared audio.** Play the same sound on several outputs at once, Bluetooth and wired, each with its own delay and volume to keep them in sync.
 - **Quick toggles** for Wi-Fi, Bluetooth, microphone and output device (or power mode and battery on laptops), plus volume, mic and brightness sliders. Rest the mouse on the battery tile for its capacity, wear, charge rate and time left.
-- **Battery pills.** On a laptop a pill drops when you plug in or unplug, and once when the battery runs low (20% by default, anywhere from 5 to 50%), even in Do Not Disturb. Windows tells Astraeus when power changes; nothing polls.
+- **Battery pills.** On a laptop a pill drops when you plug in or unplug, and once when the battery runs low (20% by default, anywhere from 5 to 50%), even in Do Not Disturb. Windows tells Aryan Island when power changes; nothing polls.
 - **Volume mixer.** Click the speaker on the volume slider for a small mixing console: a fader and mute for every app making sound, next to the master.
 - **Bluetooth control center.** Right-click the Bluetooth tile and your devices orbit your PC: connected ones close in with their battery levels, paired ones further out, new finds gliding in while it scans. Click a device to connect, disconnect or pair it, or hold to forget it.
 - **Wi-Fi.** Right-click the Wi-Fi tile, or press **Networks** on the Network page: nearby networks ride the arcs of a big Wi-Fi symbol, closer the stronger they are. Join one with its password right in the panel, or hold to forget a saved one.
 - **System stats:** CPU, GPU, memory, top processes, network throughput and latency, local and public IP, all with smooth sparklines.
 - **Tools:** lock, sleep, sign out, restart and shut down (destructive actions are press-and-hold), a timer, a stopwatch with laps and focus sessions (focus and break rounds with notifications), a screen color picker that copies the hex code, a screenshot shortcut, keep-awake, energy saver, airplane mode and a shortcut to the Windows notification center. Pick which quick tiles show and in what order, like widgets: right-click them on the Tools page (or use **Tools tiles** in Settings), drag to reorder, **×** to take one off and **+** to bring one back. While a timer, stopwatch or focus session runs, a small round bubble beside the pill counts it down; click it to go straight to that tool.
-- **A keyboard shortcut.** Win+Alt+A opens the panel on the screen your mouse is on; the arrow keys and the number keys move between pages, and Esc closes it. The shortcut can be changed in [`astraeus.ini`](#%EF%B8%8F-configuration).
+- **A keyboard shortcut.** Win+Alt+A opens the panel on the screen your mouse is on; the arrow keys and the number keys move between pages, and Esc closes it. The shortcut can be changed in [`aryan_island.ini`](#%EF%B8%8F-configuration).
 - **Weather and a calendar.** Weather for your location, in Celsius or Fahrenheit. Type a city in Settings (add its country or region, like `Paris, Texas`, to pick between places with the same name) and your IP address is never used to look you up at all. Click the weather card for a month at a glance, with holidays from around the world lit up and a greeting when you hover them, and click the weather there for the next hours and days. Connect Google Calendar, Outlook or iCloud by copying your calendar's private link, and your events show up on it, stored encrypted and shared with HaloBar.
-- **Looks and colors.** The palette is pulled from your wallpaper, or from the album art of whatever is playing, or from any accent you pick. The accent can also follow Windows' own accent color, live. The looks: dark (the default); light; glass, a live frosted blur of whatever is behind the panel, with a tint that deepens over bright pages so white text stays readable and eases back over dark ones; custom, where a color wheel lets you pick any accent and any background, with text that turns white or black to suit; Starfall, a deep night sky with fine star dust and a violet glow that drifts slowly around the open panel, worn by the pill too; and HaloBar, which wears whatever HaloBar wears. On the solid looks an opacity slider lets the desktop show through; on glass the slider sets the blur instead. While it wears HaloBar's look, the opacity and blur are HaloBar's too, and its own slider steps aside; HaloBar does the same while it follows Astraeus. Clear is glass with no frost on the pill, whose icons turn black or white to suit what's behind it, while the panel takes a tint from your wallpaper; glass can wear a dark, white or any other tint. Turn on **Different theme when not on desktop** and the desktop and your apps each get a whole theme of their own, shared with HaloBar when one follows the other.
+- **Looks and colors.** The palette is pulled from your wallpaper, or from the album art of whatever is playing, or from any accent you pick. The accent can also follow Windows' own accent color, live. The looks: dark (the default); light; glass, a live frosted blur of whatever is behind the panel, with a tint that deepens over bright pages so white text stays readable and eases back over dark ones; custom, where a color wheel lets you pick any accent and any background, with text that turns white or black to suit; Starfall, a deep night sky with fine star dust and a violet glow that drifts slowly around the open panel, worn by the pill too; and HaloBar, which wears whatever HaloBar wears. On the solid looks an opacity slider lets the desktop show through; on glass the slider sets the blur instead. While it wears HaloBar's look, the opacity and blur are HaloBar's too, and its own slider steps aside; HaloBar does the same while it follows Aryan Island. Clear is glass with no frost on the pill, whose icons turn black or white to suit what's behind it, while the panel takes a tint from your wallpaper; glass can wear a dark, white or any other tint. Turn on **Different theme when not on desktop** and the desktop and your apps each get a whole theme of their own, shared with HaloBar when one follows the other.
 - **Settings you touch.** Pick the edge it lives on, which monitor (or all of them, with the open panel and the resting pill following your mouse from screen to screen), your accent color and look from small pictures of the real thing. Reduce motion calms every animation. Keep the fullscreen player's controls up or let them fade at rest, choose which pages the rail shows and in what order, open on the last page or one you choose, and export your settings to a file, import them on another PC, or reset everything to defaults. Power, weather, volume and brightness, backup and the display size (80 to 130%) sit together under **Advanced**.
-- **A rail that scrolls.** With more than five pages on, the rail shows five and scrolls instead of squeezing them in: small arrows show where the rest are, the wheel moves it one page at a time, and Up and Down switch pages while the mouse is over it (Left and Right when Astraeus sits on a side edge).
+- **A rail that scrolls.** With more than five pages on, the rail shows five and scrolls instead of squeezing them in: small arrows show where the rest are, the wheel moves it one page at a time, and Up and Down switch pages while the mouse is over it (Left and Right when Aryan Island sits on a side edge).
 - **The island.** Over a maximized window, or tiled windows that fill the screen, a small pill shows what's playing instead of dropping the whole panel over your work. It can stay a moment, minutes, or always while music plays. With **Pill on the desktop** (on by default) it also stays up whenever no app window is under it, after Win+D or once the last window closes; it goes again when a window comes back under it. Turn on **Always show the pill** and it stays up with the clock between two small widgets of your choice (weather, battery, CPU, memory or network); it repaints only when one of them changes, once a minute for the clock. Windows notifications can arrive as pills too, and when HaloBar is running with its notification pills on they always do, in place of its own. Do Not Disturb, in Settings and on the Tools page, quiets them, and is shared with HaloBar.
 - **The long pill.** The pill on the desktop while **Pill on the desktop** is on, and over your apps too if you like: under **Long pill** in Settings, pick the regular pill or the long one for each place. Right-click either pill to arrange the long one: the clock, date, weather, music, cover, visualizer, timer, volume, Wi-Fi, CPU, GPU, RAM, network, disk, the S&P 500, a live score and more, on any edge, stuck to it or floating, with a body of your choice. **Own widgets** on the editor's **Not on desktop** tab gives it a second set of items for over your apps.
-- **Volume and brightness pill (experimental).** Off by default. Switch on **Replace Windows volume popup** and a pill shows every volume and brightness change. While it's on, Astraeus takes the volume keys before Windows sees them, so Windows' own volume popup stays away; the brightness keys still bring up Windows' popup alongside it.
+- **Volume and brightness pill (experimental).** Off by default. Switch on **Replace Windows volume popup** and a pill shows every volume and brightness change. While it's on, Aryan Island takes the volume keys before Windows sees them, so Windows' own volume popup stays away; the brightness keys still bring up Windows' popup alongside it.
 - **A Widgets page.** More than 80 widgets to choose from a searchable gallery: clocks, weather, timers, notes, system rings, stocks, US markets, sports scores and fixtures, and accounts you connect with your own keys. Each one can be small, wide or large, you arrange them by dragging, and clicking one opens its details: the forecast, a stock's chart, every score, and any game's scorers, cards, stats, running order or boards.
-- **Sports.** Follow up to three of nearly 50 leagues, men's and women's: football, F1 and motorsport, basketball, American football, baseball, hockey, cricket, rugby, tennis, golf, MMA, chess and more. Times show in your own time zone, and a coming game can go straight into Astraeus' calendar, with no calendar account needed.
+- **Sports.** Follow up to three of nearly 50 leagues, men's and women's: football, F1 and motorsport, basketball, American football, baseball, hockey, cricket, rugby, tennis, golf, MMA, chess and more. Times show in your own time zone, and a coming game can go straight into Aryan Island' calendar, with no calendar account needed.
 - **A display dashboard.** Give a whole screen to a grid of tiles you arrange yourself, with its own layout for each monitor.
 - **Accessibility.** High contrast, a text size that can follow Windows, full keyboard navigation, and support for Narrator, NVDA and JAWS. See **Settings → Advanced → Accessibility**.
 - **Report a problem.** **Settings → Advanced** copies a short report to your clipboard, with your name taken out. Nothing is sent: you read it, then paste it where you choose.
@@ -131,7 +131,7 @@ No Electron, no web view, no runtime to install. Just one small native executabl
 
 ### Six themes
 
-Custom (above), where a color wheel picks any accent and any background, Glass, Clear, Dark, Light, and Starfall, a night sky with a slowly drifting violet glow that only Astraeus has.
+Custom (above), where a color wheel picks any accent and any background, Glass, Clear, Dark, Light, and Starfall, a night sky with a slowly drifting violet glow that only Aryan Island has.
 
 <table>
   <tr>
@@ -154,7 +154,7 @@ Custom (above), where a color wheel picks any accent and any background, Glass, 
 
 ## ⚡ Performance
 
-Astraeus is built to cost nothing while you are not looking at it. Measured on a modest laptop
+Aryan Island is built to cost nothing while you are not looking at it. Measured on a modest laptop
 (Intel Core i5-4210U, integrated graphics, 8 GB RAM, Windows 11, 1366x768):
 
 | | Closed | Open | After closing |
@@ -173,7 +173,7 @@ That's light enough for 2 GB machines and entry-level Celeron and Pentium laptop
 
 ### How it compares
 
-| | **Astraeus** | Typical web-based widget apps |
+| | **Aryan Island** | Typical web-based widget apps |
 | --- | --- | --- |
 | **Built with** | Native C++, Direct2D, DirectComposition | Electron or a bundled web view |
 | **Memory while idle** | 9 MB | Often 100 MB or more |
@@ -204,27 +204,27 @@ That's light enough for 2 GB machines and entry-level Celeron and Pentium laptop
 
 - Stats, Bluetooth and network workers only run while the panel is open, and the system gauges, process list and latency only while their own page shows. Bluetooth does nothing at all until you open its menu, and while closed, stats are sampled only every 5 seconds.
 - The glass blur, shared audio, the fullscreen player, the audio analyser behind the visualizer and the notification watcher are built only when you use them and torn down afterwards. The volume mixer reads apps only while it's open.
-- Battery and power changes, Windows' accent color and edits to `astraeus.ini` all arrive as notifications from Windows; nothing checks for them on a timer. The volume pill's listeners and key hook exist only while that option is on. The same goes for **Pill on the desktop**: Windows reports focus changes, minimizes and finished moves, and Astraeus looks under the island once they settle.
+- Battery and power changes, Windows' accent color and edits to `aryan_island.ini` all arrive as notifications from Windows; nothing checks for them on a timer. The volume pill's listeners and key hook exist only while that option is on. The same goes for **Pill on the desktop**: Windows reports focus changes, minimizes and finished moves, and Aryan Island looks under the island once they settle.
 - The once-a-second housekeeping timer is coalescable, so Windows can batch its wakeups with others.
 - Shelf previews are made on a short-lived thread that ends when the last one is done.
-- The GPU counter behind the System page's gauge costs seconds of CPU to open, so it's opened on a background thread the first time that page shows, never at launch. Astraeus is up in well under a second.
+- The GPU counter behind the System page's gauge costs seconds of CPU to open, so it's opened on a background thread the first time that page shows, never at launch. Aryan Island is up in well under a second.
 - Lyrics are looked up once per song from three sources at once over reused connections, kept on disk for the last 300 songs so a replay needs no network, and the soft focus of each line is baked once instead of blurred every frame.
 - Icon fonts are subset to the glyphs that are actually used (3 MB down to 33 KB) and served straight from the executable without copying.
 
 ## 📦 Installation
 
-1. Download `Astraeus.exe` from the [latest release](https://github.com/Icetist/Astraeus/releases/latest).
+1. Download `AryanIsland.exe` from the [latest release](https://github.com/aaryaninvincible/Aryan_Island/releases/latest).
 2. Run it. That's it.
 
-On first launch Astraeus asks whether it should start with Windows. Say yes and it copies itself to
-`%LOCALAPPDATA%\Programs\Astraeus` (no admin rights needed), so you can delete the downloaded file whenever you like. Either way it keeps an **Astraeus** shortcut in the Start menu, so you can find it again after closing it.
+On first launch Aryan Island asks whether it should start with Windows. Say yes and it copies itself to
+`%LOCALAPPDATA%\Programs\AryanIsland` (no admin rights needed), so you can delete the downloaded file whenever you like. Either way it keeps an **Aryan Island** shortcut in the Start menu, so you can find it again after closing it.
 
 > [!NOTE]
-> The executable is not code-signed yet, so Windows SmartScreen may show an "unknown publisher" warning the first time. Click **More info → Run anyway**. The warning is about the missing signature, not about anything the app does; every release is built from this repository by the [release workflow](./.github/workflows/release.yml), and its SHA-256 is published next to it as `Astraeus.exe.sha256` so you can check your download.
+> The executable is not code-signed yet, so Windows SmartScreen may show an "unknown publisher" warning the first time. Click **More info → Run anyway**. The warning is about the missing signature, not about anything the app does; every release is built from this repository by the [release workflow](./.github/workflows/release.yml), and its SHA-256 is published next to it as `AryanIsland.exe.sha256` so you can check your download.
 
 ### Updates
 
-With `AutoUpdate = true` (the default), Astraeus asks GitHub for the latest release 30 seconds after launch and then every 3 hours. When a newer version is out, it downloads `Astraeus.exe` and `Astraeus.exe.sha256` from this repository's releases, and installs the new executable only if its SHA-256 matches. It then restarts on the new version as soon as you aren't using the panel, and says so with a small banner. A failed download is tried again on the next check.
+With `AutoUpdate = true` (the default), Aryan Island asks GitHub for the latest release 30 seconds after launch and then every 3 hours. When a newer version is out, it downloads `AryanIsland.exe` and `AryanIsland.exe.sha256` from this repository's releases, and installs the new executable only if its SHA-256 matches. It then restarts on the new version as soon as you aren't using the panel, and says so with a small banner. A failed download is tried again on the next check.
 
 **Check for updates** in the tray menu checks right away, whatever `AutoUpdate` says, and shows the result in the menu.
 
@@ -245,7 +245,7 @@ With `AutoUpdate = true` (the default), Astraeus asks GitHub for the latest rele
 
 ## 🔒 Privacy
 
-Astraeus has no accounts, no analytics and no telemetry. It talks to the network only for the features below, each straight to the service named, never through a server of its own.
+Aryan Island has no accounts, no analytics and no telemetry. It talks to the network only for the features below, each straight to the service named, never through a server of its own.
 
 | What | Where it goes | What it sends | When | How to turn it off |
 | --- | --- | --- | --- | --- |
@@ -269,19 +269,19 @@ Astraeus has no accounts, no analytics and no telemetry. It talks to the network
 
 What stays on your PC:
 
-- **Settings** made in the Settings sheet live in the registry under `HKCU\Software\Astraeus`, along with the last weather location found and the last version installed by the updater. **Export** leaves those two out.
-- **`astraeus.ini`** and **`astraeus.log`** sit next to the executable (`perf.log` too, if `PerfLog` is on). If Astraeus crashes, the reason is written to `astraeus.log`; nothing is sent anywhere.
-- **`%LOCALAPPDATA%\Astraeus`** holds the lyrics cache (`lyrics`, the last 300 songs), your calendar links (`accounts`, encrypted with Windows so only your Windows user can read them, and shared with HaloBar), the games you added to the calendar (`my-events.txt`), and `shelf.txt` only if **Keep after restart** is on the Shelf page.
+- **Settings** made in the Settings sheet live in the registry under `HKCU\Software\AryanIsland`, along with the last weather location found and the last version installed by the updater. **Export** leaves those two out.
+- **`aryan_island.ini`** and **`aryan_island.log`** sit next to the executable (`perf.log` too, if `PerfLog` is on). If Aryan Island crashes, the reason is written to `aryan_island.log`; nothing is sent anywhere.
+- **`%LOCALAPPDATA%\AryanIsland`** holds the lyrics cache (`lyrics`, the last 300 songs), your calendar links (`accounts`, encrypted with Windows so only your Windows user can read them, and shared with HaloBar), the games you added to the calendar (`my-events.txt`), and `shelf.txt` only if **Keep after restart** is on the Shelf page.
 - **Notification pills** read Windows' own notification list on your PC while they're switched on. Nothing from it leaves the machine.
 - **Workspaces** talk only to a tiling window manager running on your own PC, over a local pipe or `localhost`, or read Windows' own virtual desktops.
 - **Widget keys and passwords** are encrypted with Windows so only your Windows user can read them, and kept in the registry with the rest of each widget's settings and your notes. **Export** leaves all of these out, so widgets need connecting again on another PC.
-- **Screen Time** notes the app in front every 15 seconds, only while that widget is on your Widgets page, in `%LOCALAPPDATA%\Astraeus\screentime.txt`.
-- **A problem report** is only ever copied to your clipboard. It holds your version, PC specs, a short list of plain settings and recent lines from `astraeus.log`, with your user name, PC name and home folder replaced. Read it before you share it.
-- **The mixer's groups and profiles, your to-dos and your server list** live in the registry under `HKCU\Software\Astraeus`.
+- **Screen Time** notes the app in front every 15 seconds, only while that widget is on your Widgets page, in `%LOCALAPPDATA%\AryanIsland\screentime.txt`.
+- **A problem report** is only ever copied to your clipboard. It holds your version, PC specs, a short list of plain settings and recent lines from `aryan_island.log`, with your user name, PC name and home folder replaced. Read it before you share it.
+- **The mixer's groups and profiles, your to-dos and your server list** live in the registry under `HKCU\Software\AryanIsland`.
 
 ## ⚙️ Configuration
 
-Everything below lives in `astraeus.ini` next to the executable. Open it from the tray menu (**Edit config**) and save: changes apply right away, no restart needed. Unknown keys and invalid values are noted in `astraeus.log`, and the default is kept. Choices made in the Settings sheet live in the registry; **Export** in Settings writes them, together with the keys of `astraeus.ini`, to a single `.ini` file you can **Import** again.
+Everything below lives in `aryan_island.ini` next to the executable. Open it from the tray menu (**Edit config**) and save: changes apply right away, no restart needed. Unknown keys and invalid values are noted in `aryan_island.log`, and the default is kept. Choices made in the Settings sheet live in the registry; **Export** in Settings writes them, together with the keys of `aryan_island.ini`, to a single `.ini` file you can **Import** again.
 
 | Key | Default | Description |
 | --- | --- | --- |
@@ -312,28 +312,28 @@ mkdir build\obj
 rc /nologo /fo build\obj\app.res res\app.rc
 cl /nologo /std:c++20 /O2 /GL /Gw /guard:cf /EHsc /MT /W4 /permissive- /utf-8 /MP ^
    /DUNICODE /D_UNICODE /DWIN32_LEAN_AND_MEAN /DNOMINMAX ^
-   /Fo:build\obj\ src\*.cpp build\obj\app.res /Fe:build\Astraeus.exe ^
+   /Fo:build\obj\ src\*.cpp build\obj\app.res /Fe:build\AryanIsland.exe ^
    /link /LTCG /SUBSYSTEM:WINDOWS /OPT:REF /OPT:ICF /guard:cf /CETCOMPAT /DYNAMICBASE /NXCOMPAT /MANIFEST:NO ^
    user32.lib gdi32.lib shell32.lib shlwapi.lib ole32.lib oleaut32.lib advapi32.lib dwmapi.lib ^
    d2d1.lib d3d11.lib dxgi.lib dxguid.lib dwrite.lib dcomp.lib windowscodecs.lib ^
    pdh.lib iphlpapi.lib wlanapi.lib winhttp.lib bthprops.lib powrprof.lib wbemuuid.lib ntdll.lib windowsapp.lib
 ```
 
-The result is a single self-contained `build\Astraeus.exe`, with the fonts built in. `build.cmd` runs the same steps, but expects the Visual Studio Build Tools in their default install folder; edit its `vcvars64.bat` path if yours live elsewhere.
+The result is a single self-contained `build\AryanIsland.exe`, with the fonts built in. `build.cmd` runs the same steps, but expects the Visual Studio Build Tools in their default install folder; edit its `vcvars64.bat` path if yours live elsewhere.
 
 ## ❓ FAQ
 
 <details>
 <summary><b>How do I uninstall it?</b></summary>
 
-Turn off **Start with Windows** in the tray menu, exit Astraeus, then delete `%LOCALAPPDATA%\Programs\Astraeus` and the **Astraeus** shortcut in the Start menu. Optionally remove the `HKCU\Software\Astraeus` registry key, which holds your settings, and `%LOCALAPPDATA%\Astraeus`, which holds the lyrics cache, a kept shelf and your calendar links (HaloBar reads the same calendar links, so keep that folder if you use it).
+Turn off **Start with Windows** in the tray menu, exit Aryan Island, then delete `%LOCALAPPDATA%\Programs\AryanIsland` and the **Aryan Island** shortcut in the Start menu. Optionally remove the `HKCU\Software\AryanIsland` registry key, which holds your settings, and `%LOCALAPPDATA%\AryanIsland`, which holds the lyrics cache, a kept shelf and your calendar links (HaloBar reads the same calendar links, so keep that folder if you use it).
 
 </details>
 
 <details>
 <summary><b>Can it replace my desktop widgets?</b></summary>
 
-For a lot of people, yes. Astraeus covers the usual desktop widgets (media, stats, network, weather, quick toggles) in a single native app with no skins to install, and it is designed to sit at near-zero cost while idle.
+For a lot of people, yes. Aryan Island covers the usual desktop widgets (media, stats, network, weather, quick toggles) in a single native app with no skins to install, and it is designed to sit at near-zero cost while idle.
 
 </details>
 
@@ -347,20 +347,20 @@ Many keyboards, mice and controllers reconnect on their own the moment you touch
 <details>
 <summary><b>Can I turn off automatic updates?</b></summary>
 
-Yes. Set `AutoUpdate = false` in `astraeus.ini`; it applies as soon as you save. **Check for updates** in the tray menu still works when you want it.
+Yes. Set `AutoUpdate = false` in `aryan_island.ini`; it applies as soon as you save. **Check for updates** in the tray menu still works when you want it.
 
 </details>
 
 <details>
 <summary><b>The shortcut doesn't do anything.</b></summary>
 
-Another app probably holds it. `astraeus.log` says so if it does; pick another one with `Hotkey =` in `astraeus.ini`.
+Another app probably holds it. `aryan_island.log` says so if it does; pick another one with `Hotkey =` in `aryan_island.ini`.
 
 </details>
 
 ## 🙏 Credits
 
-- **Developed by [aaryaninvincible](https://github.com/aaryaninvincible)** — Customized with the Apple iOS / VisionOS Liquid Glass Design System from Portfolio (based on the open-source Astraeus project by Icetist).
+- **Developed by [aaryaninvincible](https://github.com/aaryaninvincible)** — Customized with the Apple iOS / VisionOS Liquid Glass Design System from Portfolio .
 - [Outfit](https://github.com/Outfitio/Outfit-Fonts) by the Outfit Project Authors, licensed under the [SIL Open Font License 1.1](./LICENSES/Outfit-OFL.txt).
 - [Material Symbols](https://github.com/google/material-design-icons) by Google, licensed under the [Apache License 2.0](./LICENSES/MaterialSymbols-Apache-2.0.txt).
 - [Nunito](https://github.com/googlefonts/nunito) by the Nunito Project Authors, licensed under the [SIL Open Font License 1.1](./LICENSES/Nunito-OFL.txt).
@@ -371,4 +371,4 @@ Another app probably holds it. `astraeus.log` says so if it does; pick another o
 
 ## 📄 License
 
-Developed by **aaryaninvincible** · Original base Copyright (C) 2026 Icetist. Licensed under the [GNU General Public License v3.0](./LICENSE): you may use, change and share it, and anything you share that is built on it must stay open under the same license.
+Developed by **aaryaninvincible** . Licensed under the [GNU General Public License v3.0](./LICENSE): you may use, change and share it, and anything you share that is built on it must stay open under the same license.

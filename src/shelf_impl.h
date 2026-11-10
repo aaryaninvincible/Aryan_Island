@@ -58,7 +58,7 @@ constexpr UINT_PTR kClipTimer = 1, kSaveTimer = 2, kAgeTimer = 3; // the shelf w
 constexpr UINT kSaveDelayMs = 800; // a burst of copies is one write
 constexpr size_t kImageMax = 48u << 20; // a bigger picture isn't kept: the shelf is no photo library
 constexpr size_t kTextMax = 64 * 1024; // a longer text is cut: it's a stash, not an editor
-std::wstring Dir(); // %LOCALAPPDATA%\Astraeus, empty if unknown
+std::wstring Dir(); // %LOCALAPPDATA%\Aryan Island, empty if unknown
 std::wstring ImageDir(); // where owned images live, encrypted
 std::wstring TempDir(); // where an owned image becomes a real file for a drag or a paste
 std::string Utf8(const std::wstring& s);

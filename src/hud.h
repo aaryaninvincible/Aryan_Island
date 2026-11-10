@@ -2,7 +2,7 @@
 #include <windows.h>
 #include <memory>
 
-// the pieces behind astraeus' own volume and brightness pill; each exists only while that option is on
+// the pieces behind aryan_island' own volume and brightness pill; each exists only while that option is on
 namespace sys {
 
 class VolumeWatch { // the speakers' level and mute, told by windows on every change; msg: wparam level 0..1000, lparam muted

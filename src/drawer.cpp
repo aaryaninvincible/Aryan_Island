@@ -98,12 +98,12 @@ bool Drawer::Create(HINSTANCE instance) {
     wc.lpfnWndProc = Proc;
     wc.hInstance = instance;
     wc.hCursor = LoadCursorW(nullptr, IDC_ARROW);
-    wc.lpszClassName = L"AstraeusDrawer";
+    wc.lpszClassName = L"AryanIslandDrawer";
     RegisterClassExW(&wc);
     hwnd = CreateWindowExW(WS_EX_TOPMOST | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE | WS_EX_NOREDIRECTIONBITMAP, // no focus steal, no gdi surface (dcomp only)
-                           wc.lpszClassName, L"Astraeus", WS_POPUP, 0, 0, 1, 1, nullptr, nullptr, instance, this); // this -> WM_NCCREATE
+                           wc.lpszClassName, L"Aryan Island", WS_POPUP, 0, 0, 1, 1, nullptr, nullptr, instance, this); // this -> WM_NCCREATE
     if (!hwnd) return false;
-    access.Attach(hwnd, L"Astraeus panel");
+    access.Attach(hwnd, L"Aryan Island panel");
     BOOL off = TRUE;
     DwmSetWindowAttribute(hwnd, DWMWA_TRANSITIONS_FORCEDISABLED, &off, sizeof(off)); // no dwm fade, we animate ourselves
     WTSRegisterSessionNotification(hwnd, NOTIFY_FOR_THIS_SESSION); // locked: the pill's bars rest, nobody sees them

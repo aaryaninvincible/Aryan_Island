@@ -8,7 +8,7 @@
 namespace sys {
 namespace {
 
-constexpr wchar_t kKey[] = L"Software\\Astraeus", kValue[] = L"MixDesk", kLock[] = L"Local\\AstraeusMixDesk"; // shared with halobar: one setup, one engine
+constexpr wchar_t kKey[] = L"Software\\AryanIsland", kValue[] = L"MixDesk", kLock[] = L"Local\\AryanIslandMixDesk"; // shared with halobar: one setup, one engine
 constexpr float kLoud = 0.02f, kHold = 1.2f; // a lowering group counts as playing above this peak, and for this long after
 constexpr float kDuckDown = 8, kDuckUp = 1.6f; // per second: ducks fast, comes back gently
 constexpr float kDrift = 0.02f, kStep = 0.004f; // a level this far from ours was moved by someone else; closer than a step isn't worth a write

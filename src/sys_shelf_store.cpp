@@ -26,8 +26,8 @@ namespace {
 constexpr wchar_t kKeepVal[] = L"ShelfKeep";
 constexpr wchar_t kDatName[] = L"\\shelf.dat", kOldName[] = L"\\shelf.txt"; // the old plain file is read once, then gone
 constexpr wchar_t kImgExt[] = L".img";
-constexpr char kSalt[] = "Astraeus shelf"; // entropy: another app running as you can't just ask dpapi for it
-constexpr wchar_t kHeader[] = L"astraeus-shelf 2";
+constexpr char kSalt[] = "Aryan Island shelf"; // entropy: another app running as you can't just ask dpapi for it
+constexpr wchar_t kHeader[] = L"aryan-island-shelf 2";
 constexpr size_t kSaveTextMax = 16 * 1024; // a text is written this long at most
 constexpr size_t kFileMax = 64u << 20, kOldMax = 1u << 20;
 constexpr UINT kDibMaxPx = 8192; // a bigger picture pastes as its file only
@@ -235,7 +235,7 @@ namespace shelfio {
 std::wstring Dir() {
     PWSTR base = nullptr;
     std::wstring path;
-    if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, nullptr, &base))) path = std::wstring(base) + L"\\Astraeus";
+    if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, nullptr, &base))) path = std::wstring(base) + L"\\AryanIsland";
     CoTaskMemFree(base);
     return path;
 }
@@ -248,7 +248,7 @@ std::wstring ImageDir() {
 std::wstring TempDir() {
     wchar_t buf[MAX_PATH + 1];
     DWORD n = GetTempPathW(MAX_PATH + 1, buf);
-    return n ? std::wstring(buf, n) + L"Astraeus Shelf" : L"";
+    return n ? std::wstring(buf, n) + L"Aryan Island Shelf" : L"";
 }
 
 std::string Utf8(const std::wstring& s) {
@@ -267,7 +267,7 @@ std::wstring Wide(const std::string& s) {
 
 bool Protect(const std::string& plain, std::string& blob) {
     DATA_BLOB in = {(DWORD)plain.size(), (BYTE*)plain.data()}, salt = Salt(), out{};
-    if (!CryptProtectData(&in, L"Astraeus shelf", &salt, nullptr, nullptr, CRYPTPROTECT_UI_FORBIDDEN, &out)) return false; // only this windows user can read it back
+    if (!CryptProtectData(&in, L"Aryan Island shelf", &salt, nullptr, nullptr, CRYPTPROTECT_UI_FORBIDDEN, &out)) return false; // only this windows user can read it back
     blob.assign((const char*)out.pbData, out.cbData);
     LocalFree(out.pbData);
     return true;

@@ -37,7 +37,7 @@ constexpr double kSettleSec = 4; // drift error is worked off over about this lo
 constexpr DWORD kIdleWaitMs = 250; // wake period while nothing is playing
 constexpr DWORD kPollMs = 10; // wake period when loopback events aren't supported
 constexpr int kMaxDelayMs = 1000;
-constexpr wchar_t kRegKey[] = L"Software\\Astraeus\\Share";
+constexpr wchar_t kRegKey[] = L"Software\\AryanIsland\\Share";
 const PROPERTYKEY kNameKey = {{0xa45c254e, 0xdf1c, 0x4efd, {0x80, 0x20, 0x67, 0xd1, 0x46, 0xa8, 0x50, 0xe0}}, 14}; // PKEY_Device_FriendlyName
 
 void Log(const wchar_t* what) { OutputDebugStringW((std::wstring(L"[share] ") + what + L"\n").c_str()); }

@@ -244,7 +244,7 @@ void Tour(PageCtx& p, const D2D1_RECT_F& r, bool live) { // play it now, and whe
     Model& m = p.m;
     D2D1_RECT_F in = Box(c, t, r, L"Tour");
     if (Act(ui, t, Ui::Id("set.tour"), Rect(in.left, in.top, kTourBtnW, kRowH), L"Take the tour", false, false, live)) m.tourAsk = true; // a quiet button: the card shouldn't shout
-    if (SwitchRow(ui, t, "set.tour.next", Rect(in.left + kTourBtnW + 16, in.top, Width(in) - kTourBtnW - 16, kRowH), L"Show it when Astraeus starts", m.tourNext != 0, live)) Flip(m, m.tourNext, L"TourNext");
+    if (SwitchRow(ui, t, "set.tour.next", Rect(in.left + kTourBtnW + 16, in.top, Width(in) - kTourBtnW - 16, kRowH), L"Show it when Aryan Island starts", m.tourNext != 0, live)) Flip(m, m.tourNext, L"TourNext");
 }
 
 void FullBtns(PageCtx& p, const D2D1_RECT_F& r, bool live) { // the two faint marks in the fullscreen player's corner: everything else about it is in its own editor
@@ -434,7 +434,7 @@ void ShelfHistory(PageCtx& p, const D2D1_RECT_F& r, bool live) { // how much the
     Note(c, t, in, in.top + kSlideH + kKnobH + 27, L"Pinned and noted cards always stay");
 }
 
-void Hud(PageCtx& p, const D2D1_RECT_F& r, bool live) { // astraeus' own volume pill in place of windows' popup
+void Hud(PageCtx& p, const D2D1_RECT_F& r, bool live) { // aryan_island' own volume pill in place of windows' popup
     Ui& ui = p.ui;
     Canvas& c = ui.C();
     const Theme& t = p.shell;
@@ -459,7 +459,7 @@ void Backup(PageCtx& p, const D2D1_RECT_F& r, bool live) { // export, import, st
     D2D1_RECT_F in = Box(c, t, r, L"Backup");
     float bw = (Width(in) - 8) / 2;
     static HWND host = nullptr; // the dialogs and the restart live there; looked up once, not every frame
-    if (!IsWindow(host)) host = FindWindowW(L"AstraeusHost", nullptr);
+    if (!IsWindow(host)) host = FindWindowW(L"AryanIslandHost", nullptr);
     if (Act(ui, t, Ui::Id("set.export"), Rect(in.left, in.top + 2, bw, 30), L"Export…", false, false, live) && host) {
         p.wantClose = true;
         PostMessageW(host, WM_COMMAND, tray::kExport, 0);
@@ -478,10 +478,10 @@ void Backup(PageCtx& p, const D2D1_RECT_F& r, bool live) { // export, import, st
     if (progress > 0) c.Fill({reset.left, reset.top, reset.left + Width(reset) * progress, reset.bottom}, rad, kDanger.Alpha(0.55f));
     c.Stroke(reset, rad, kDanger.Alpha(hover ? 0.8f : 0.4f), 1);
     c.Text(progress > 0 ? L"Keep holding…" : hover ? L"Hold to reset every setting" : L"Reset to defaults", reset, Weight::Medium, 12, hover ? t.text : t.textDim, Align::Center);
-    if (fire && host) PostMessageW(host, WM_COMMAND, tray::kReset, 0); // astraeus restarts on its defaults
+    if (fire && host) PostMessageW(host, WM_COMMAND, tray::kReset, 0); // aryan_island restarts on its defaults
 }
 
-constexpr wchar_t kIssues[] = L"https://github.com/Icetist/Astraeus/issues/new"; // never prefilled: a report only travels if the user pastes it
+constexpr wchar_t kIssues[] = L"https://github.com/aaryaninvincible/Aryan_Island/issues/new"; // never prefilled: a report only travels if the user pastes it
 constexpr double kCopiedSec = 2.5; // how long the button says what happened
 
 void Problem(PageCtx& p, const D2D1_RECT_F& r, bool live) { // a report for the clipboard, and where to take it; nothing is sent from here
@@ -608,9 +608,9 @@ void Updates(PageCtx& p, const D2D1_RECT_F& r, bool live) { // the version, and 
     Ui& ui = p.ui;
     Canvas& c = ui.C();
     const Theme& t = p.shell;
-    D2D1_RECT_F in = Box(c, t, r, L"Astraeus  ·  Developed by aaryaninvincible");
+    D2D1_RECT_F in = Box(c, t, r, L"Aryan Island  ·  Developed by aaryaninvincible");
     static HWND host = nullptr; // the updater lives there; looked up once, not every frame
-    if (!IsWindow(host)) host = FindWindowW(L"AstraeusHost", nullptr);
+    if (!IsWindow(host)) host = FindWindowW(L"AryanIslandHost", nullptr);
     bool busy = tray::UpdateBusy();
     float cy = (in.top + in.bottom) / 2;
     if (Act(ui, t, Ui::Id("set.update"), Rect(in.left, cy - 15, kUpdBtnW, 30), L"Check for updates", true, busy, live && !busy) && host) {

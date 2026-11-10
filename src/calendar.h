@@ -6,8 +6,8 @@
 #include <vector>
 
 // The user's own calendars, from their private calendar links (google's "secret address in ical format", outlook's and
-// icloud's published links). The links are kept encrypted for this windows user in %LOCALAPPDATA%\Astraeus\accounts,
-// shared by astraeus island and halobar: connect in either, both show it. Same file in both apps.
+// icloud's published links). The links are kept encrypted for this windows user in %LOCALAPPDATA%\Aryan Island\accounts,
+// shared by aryan_island island and halobar: connect in either, both show it. Same file in both apps.
 namespace sys::cal {
 
 struct Event {

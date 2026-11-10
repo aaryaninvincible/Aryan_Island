@@ -1,5 +1,5 @@
 // Calendars from private ical links: fetched on a worker, parsed and expanded here, kept encrypted on disk.
-// Same file in astraeus island and halobar.
+// Same file in aryan_island island and halobar.
 #include "calendar.h"
 
 #include <dpapi.h>
@@ -30,7 +30,7 @@ constexpr size_t kMaxIcs = 8 << 20; // years of events stay well under this
 constexpr int kMaxRepeats = 4000; // a rule with no end stops here even if the window didn't stop it
 constexpr int kStoreTries = 10; // the other app may be reading the store just as this one replaces it
 constexpr DWORD kStoreWaitMs = 30;
-constexpr wchar_t kEntropy[] = L"Astraeus calendars";
+constexpr wchar_t kEntropy[] = L"Aryan Island calendars";
 
 // ---- days and dates, in plain civil arithmetic ----
 int64_t DaysFromCivil(int y, int m, int d) { // days since 1970-01-01
@@ -413,7 +413,7 @@ std::wstring StorePath() {
     wchar_t base[MAX_PATH];
     DWORD n = GetEnvironmentVariableW(L"LOCALAPPDATA", base, MAX_PATH);
     if (!n || n >= MAX_PATH) return L"";
-    std::wstring dir = std::wstring(base) + L"\\Astraeus";
+    std::wstring dir = std::wstring(base) + L"\\AryanIsland";
     CreateDirectoryW(dir.c_str(), nullptr);
     dir += L"\\accounts";
     CreateDirectoryW(dir.c_str(), nullptr);
@@ -454,7 +454,7 @@ bool WriteLinks(const std::vector<Link>& links) {
     for (const auto& l : links) text += l.url + L"\t" + l.name + L"\n";
     DATA_BLOB in{(DWORD)(text.size() * sizeof(wchar_t)), reinterpret_cast<BYTE*>(text.data())}, out{};
     DATA_BLOB salt{(DWORD)sizeof(kEntropy), (BYTE*)kEntropy};
-    bool ok = CryptProtectData(&in, L"Astraeus calendars", &salt, nullptr, nullptr, CRYPTPROTECT_UI_FORBIDDEN, &out) != FALSE; // only this windows user can read it back
+    bool ok = CryptProtectData(&in, L"Aryan Island calendars", &salt, nullptr, nullptr, CRYPTPROTECT_UI_FORBIDDEN, &out) != FALSE; // only this windows user can read it back
     SecureZeroMemory(text.data(), text.size() * sizeof(wchar_t));
     if (!ok) return false;
     std::wstring path = StorePath(), temp = path + L".new";
@@ -573,7 +573,7 @@ bool mineRead = false;
 std::wstring MinePath() {
     PWSTR base = nullptr;
     std::wstring path;
-    if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, nullptr, &base))) path = std::wstring(base) + L"\\Astraeus\\my-events.txt";
+    if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, nullptr, &base))) path = std::wstring(base) + L"\\AryanIsland\\my-events.txt";
     CoTaskMemFree(base);
     return path;
 }

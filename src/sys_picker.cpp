@@ -153,10 +153,10 @@ void Start(HWND notify, UINT msg) {
         WNDCLASSEXW wc = {sizeof(wc)};
         wc.lpfnWndProc = Proc;
         wc.hInstance = inst;
-        wc.lpszClassName = L"AstraeusPicker";
+        wc.lpszClassName = L"AryanIslandPicker";
         registered = RegisterClassExW(&wc) != 0;
     }
-    win = CreateWindowExW(WS_EX_LAYERED | WS_EX_TOPMOST | WS_EX_TOOLWINDOW | WS_EX_TRANSPARENT | WS_EX_NOACTIVATE, L"AstraeusPicker", L"", WS_POPUP, 0, 0, kW, kH,
+    win = CreateWindowExW(WS_EX_LAYERED | WS_EX_TOPMOST | WS_EX_TOOLWINDOW | WS_EX_TRANSPARENT | WS_EX_NOACTIVATE, L"AryanIslandPicker", L"", WS_POPUP, 0, 0, kW, kH,
                           nullptr, nullptr, inst, nullptr);
     if (!win) return;
     font = CreateFontW(-15, 0, 0, 0, FW_SEMIBOLD, 0, 0, 0, DEFAULT_CHARSET, 0, 0, CLEARTYPE_QUALITY, 0, L"Segoe UI");

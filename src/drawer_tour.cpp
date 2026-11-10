@@ -18,14 +18,14 @@ struct Step {
     const wchar_t* other; // said instead when there's nothing to point at: no song playing, the tile taken off
 };
 const Step kSteps[] = {
-    {L"Welcome to Astraeus", L"A quick look at how to make it yours.\nIt takes about a minute.", -1, kSpotNone, nullptr},
+    {L"Welcome to Aryan Island", L"A quick look at how to make it yours.\nIt takes about a minute.", -1, kSpotNone, nullptr},
     {L"Your pages", L"Click an icon to switch pages. Not\nevery page is here at first: right-click\nthe rail to add more, like Widgets,\nreorder them, or pick where it opens.", -1, kSpotRail, nullptr},
     {L"Quick tiles", L"Right-click the tiles to choose which\nones show, and drag them into order.", Model::kPgTools, kSpotTiles, nullptr},
     {L"Fullscreen player", L"Click the album cover for fullscreen.\nThe pencil in its top corner lets you\nmove, resize and restyle all of it.", Model::kPgMedia, kSpotCover,
      L"When something's playing, click the\nalbum cover for fullscreen. The pencil\nin its top corner lets you move, resize\nand restyle all of it."},
     {L"Widgets", L"Add widgets puts clocks, stocks,\nweather and more on this board.", Model::kPgWidgets, kSpotAdd, nullptr},
-    {L"Settings", L"This tile opens Settings, where the\nrest of Astraeus can be made yours.", Model::kPgTools, kSpotSettings,
-     L"Settings has the rest of Astraeus.\nOpen it from the tray icon's menu."},
+    {L"Settings", L"This tile opens Settings, where the\nrest of Aryan Island can be made yours.", Model::kPgTools, kSpotSettings,
+     L"Settings has the rest of Aryan Island.\nOpen it from the tray icon's menu."},
     {L"You're all set", L"Take the tour again any time from\nSettings, under Updates.", -1, kSpotNone, nullptr},
 };
 constexpr int kStepCount = (int)(sizeof(kSteps) / sizeof(kSteps[0]));

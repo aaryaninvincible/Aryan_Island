@@ -15,7 +15,7 @@ namespace backup {
 
 namespace {
 
-constexpr wchar_t kKey[] = L"Software\\Astraeus";
+constexpr wchar_t kKey[] = L"Software\\AryanIsland";
 constexpr wchar_t kSettings[] = L"[Settings]", kConfig[] = L"[Config]";
 constexpr const wchar_t* kSkip[] = {L"UpdatedTo", L"WxPlace", L"WxCityPlace"}; // the updater's own state and where you are: not settings, never exported
 constexpr DWORD kTextMax = 1024; // longer text values aren't settings
@@ -76,7 +76,7 @@ bool Skipped(const wchar_t* name) {
     return false;
 }
 
-bool PlainName(const std::wstring& n) { // value names astraeus writes: letters and digits only
+bool PlainName(const std::wstring& n) { // value names aryan_island writes: letters and digits only
     if (n.empty() || n.size() > 64) return false;
     for (wchar_t c : n)
         if (!iswalnum(c)) return false;
@@ -86,11 +86,11 @@ bool PlainName(const std::wstring& n) { // value names astraeus writes: letters 
 std::wstring Pick(HWND owner, bool save) { // windows' own file dialog, .ini only
     ComPtr<IFileDialog> dlg;
     if (FAILED(CoCreateInstance(save ? CLSID_FileSaveDialog : CLSID_FileOpenDialog, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&dlg)))) return L"";
-    COMDLG_FILTERSPEC types[] = {{L"Astraeus settings", L"*.ini"}};
+    COMDLG_FILTERSPEC types[] = {{L"Aryan Island settings", L"*.ini"}};
     dlg->SetFileTypes(1, types);
     dlg->SetDefaultExtension(L"ini");
-    dlg->SetTitle(save ? L"Export Astraeus settings" : L"Import Astraeus settings");
-    if (save) dlg->SetFileName(L"Astraeus settings.ini");
+    dlg->SetTitle(save ? L"Export Aryan Island settings" : L"Import Aryan Island settings");
+    if (save) dlg->SetFileName(L"Aryan Island settings.ini");
     DWORD opts = 0;
     dlg->GetOptions(&opts);
     dlg->SetOptions(opts | FOS_FORCEFILESYSTEM | (save ? FOS_OVERWRITEPROMPT : FOS_FILEMUSTEXIST));
@@ -115,7 +115,7 @@ bool Import(HWND owner, const std::wstring& iniPath) {
 }
 
 bool ExportTo(const std::wstring& file, const std::wstring& iniPath, const wchar_t* regKey) {
-    std::wstring text = L"# Astraeus settings. Import them from Settings, or keep them as a backup.\r\n\r\n";
+    std::wstring text = L"# Aryan Island settings. Import them from Settings, or keep them as a backup.\r\n\r\n";
     text += kSettings;
     text += L"\r\n";
     HKEY key = nullptr;
@@ -189,7 +189,7 @@ bool ImportFrom(const std::wstring& file, const std::wstring& iniPath, const wch
         }
     }
     if (!config.empty()) CopyFileW(iniPath.c_str(), (iniPath + L".bak").c_str(), FALSE); // the hand-edited file, comments and all, kept beside it
-    if (!config.empty() && WriteAll(iniPath, L"# Astraeus config, imported. Right-click the tray icon > Restart after editing.\r\n\r\n" + config)) any = true;
+    if (!config.empty() && WriteAll(iniPath, L"# Aryan Island config, imported. Right-click the tray icon > Restart after editing.\r\n\r\n" + config)) any = true;
     return any;
 }
 

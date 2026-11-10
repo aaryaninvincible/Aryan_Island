@@ -16,7 +16,7 @@
 
 namespace {
 
-constexpr wchar_t kClass[] = L"AstraeusDeskPill";
+constexpr wchar_t kClass[] = L"AryanIslandDeskPill";
 constexpr float kPad = 18; // room around it in its window: the bounce, the shoulders
 constexpr float kEdgeRoom = 12; // never closer than this to the end of its edge
 constexpr float kFillet = 10; // the shoulders where a stuck pill meets the edge
@@ -102,7 +102,7 @@ bool DeskPill::Create() {
         return RegisterClassExW(&wc) != 0;
     }();
     if (!registered) return false;
-    CreateWindowExW(WS_EX_TOPMOST | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE | WS_EX_NOREDIRECTIONBITMAP, kClass, L"Astraeus desktop pill", WS_POPUP, 0, 0, 1, 1, nullptr, nullptr,
+    CreateWindowExW(WS_EX_TOPMOST | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE | WS_EX_NOREDIRECTIONBITMAP, kClass, L"Aryan Island desktop pill", WS_POPUP, 0, 0, 1, 1, nullptr, nullptr,
                     GetModuleHandleW(nullptr), this); // Proc keeps the handle
     if (!hwnd) return false;
     BOOL off = TRUE;

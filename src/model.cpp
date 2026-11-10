@@ -86,7 +86,7 @@ std::wstring JoinList(const std::vector<int>& v, const wchar_t* const* keys) {
     return s.empty() ? kNoneVal : s;
 }
 
-constexpr wchar_t kOurKey[] = L"Software\\Astraeus"; // where quiet and the art background live, halobar writes them too
+constexpr wchar_t kOurKey[] = L"Software\\AryanIsland"; // where quiet and the art background live, halobar writes them too
 
 struct KeyWatch { // a key's change notice: its values are read again after a write to it, not every second
     HKEY key = nullptr;
@@ -678,7 +678,7 @@ const wchar_t* Model::TileName(int id) {
 }
 
 const wchar_t* Model::TileAbout(int id) {
-    static const wchar_t* const kAbout[kToolTiles] = {L"Pick a region of the screen", L"Pick a color from the screen", L"Keep the screen on", L"Open the notification list", L"Silence notifications", L"Turn energy saver on or off", L"Turn every radio off", L"Astraeus' settings", L"Switch between workspaces", L"Switch keyboard language", L"See and empty the bin", L"Check for updates"};
+    static const wchar_t* const kAbout[kToolTiles] = {L"Pick a region of the screen", L"Pick a color from the screen", L"Keep the screen on", L"Open the notification list", L"Silence notifications", L"Turn energy saver on or off", L"Turn every radio off", L"Aryan Island' settings", L"Switch between workspaces", L"Switch keyboard language", L"See and empty the bin", L"Check for updates"};
     return kAbout[(std::clamp)(id, 0, kToolTiles - 1)];
 }
 
@@ -1166,7 +1166,7 @@ void Model::CloseFace() {
 
 void Model::SyncFaces() {
     if (!notify) return;
-    feeds::Start(notify, WM_APP_FEEDS, L"Astraeus");
+    feeds::Start(notify, WM_APP_FEEDS, L"Aryan Island");
     std::vector<std::string> ids = faces::Feeds(faceOn);
     if (!panelLive && !studioOpen) ids.erase(std::remove_if(ids.begin(), ids.end(), [](const std::string& id) { return id != "screen"; }), ids.end()); // nothing's in sight: only screen time needs to keep noting
     bool market = pillLeft == kWMarket || pillRight == kWMarket || (AnyLong() && std::find(deskItems.begin(), deskItems.end(), (int)kWMarket) != deskItems.end()); // a pill shows the market: it stays fetched while the panel's away

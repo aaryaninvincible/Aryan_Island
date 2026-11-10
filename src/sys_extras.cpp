@@ -90,7 +90,7 @@ HostHealth Ask(const std::wstring& host) {
         wchar_t name[256] = {}, path[1024] = {};
         u.lpszHostName = name, u.dwHostNameLength = 256, u.lpszUrlPath = path, u.dwUrlPathLength = 1024;
         if (!WinHttpCrackUrl(host.c_str(), 0, 0, &u)) return r;
-        HINTERNET s = WinHttpOpen(L"Astraeus", WINHTTP_ACCESS_TYPE_AUTOMATIC_PROXY, WINHTTP_NO_PROXY_NAME, WINHTTP_NO_PROXY_BYPASS, 0);
+        HINTERNET s = WinHttpOpen(L"Aryan Island", WINHTTP_ACCESS_TYPE_AUTOMATIC_PROXY, WINHTTP_NO_PROXY_NAME, WINHTTP_NO_PROXY_BYPASS, 0);
         if (!s) return r;
         WinHttpSetTimeouts(s, 3000, 3000, 3000, 5000);
         HINTERNET c = WinHttpConnect(s, name, u.nPort, 0);

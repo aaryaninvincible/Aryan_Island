@@ -42,7 +42,7 @@ public:
     void Wake(); // launched again while running: whatever kept it hidden is dropped and it shows itself
     void Greet(); // at sign-in: the home page drops down and stays until the mouse moves
     void PlayFull(); // the fullscreen player for the playing song, asked for from outside (halobar's cover), panel open or not
-    void Reconfig(); // astraeus.ini changed on disk: sizes and corners follow without a restart
+    void Reconfig(); // aryan_island.ini changed on disk: sizes and corners follow without a restart
 
     bool Busy() const { return opened || peeking || dragging || island; } // user is looking, don't restart now
     bool NeedsFrame() const { return needsFrame || stage; } // main loop polls this to keep rendering

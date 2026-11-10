@@ -383,7 +383,7 @@ void Tile(PageCtx& p, int id, const D2D1_RECT_F& r) { // one quick tile: its sta
         break;
     }
     default:
-        if (w::Tile(ui, t, uid, r, glyph::Settings, L"Settings", L"Astraeus", false)) m.OpenSettings(); // windows settings is one tap away inside the sheet
+        if (w::Tile(ui, t, uid, r, glyph::Settings, L"Settings", L"Aryan Island", false)) m.OpenSettings(); // windows settings is one tap away inside the sheet
         break;
     }
 }

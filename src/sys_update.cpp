@@ -15,15 +15,15 @@
 namespace sys {
 namespace {
 
-constexpr wchar_t kLatest[] = L"https://api.github.com/repos/Icetist/Astraeus/releases/latest"; // public api, no token needed
-constexpr char kAsset[] = "/Astraeus.exe"; // release asset the workflow uploads
-constexpr char kHashAsset[] = "/Astraeus.exe.sha256"; // sha-256 of that exe, uploaded by the same workflow
+constexpr wchar_t kLatest[] = L"https://api.github.com/repos/aaryaninvincible/Aryan_Island/releases/latest"; // public api, no token needed
+constexpr char kAsset[] = "/AryanIsland.exe"; // release asset the workflow uploads
+constexpr char kHashAsset[] = "/AryanIsland.exe.sha256"; // sha-256 of that exe, uploaded by the same workflow
 constexpr size_t kMaxHashFile = 1024; // 64 hex chars plus maybe a filename
 constexpr size_t kHexLen = 64; // sha-256 as hex
-constexpr char kTrusted[] = "https://github.com/Icetist/Astraeus/releases/download/"; // assets must come from this repo's releases
+constexpr char kTrusted[] = "https://github.com/aaryaninvincible/Aryan_Island/releases/download/"; // assets must come from this repo's releases
 constexpr size_t kMaxExe = 32u << 20; // refuse anything absurdly large
 constexpr size_t kMinExe = 64u << 10; // or suspiciously small
-constexpr wchar_t kKey[] = L"Software\\Astraeus";
+constexpr wchar_t kKey[] = L"Software\\AryanIsland";
 constexpr wchar_t kDoneVal[] = L"UpdatedTo"; // last tag we installed, stops retry loops
 constexpr int kTries = 4; // network blips are common right after wake/boot
 constexpr DWORD kRetryMs = 30000;
@@ -87,7 +87,7 @@ std::string ParseHash(const std::string& file) { // first run of 64 hex chars, l
             hex += static_cast<char>(std::tolower(static_cast<unsigned char>(ch)));
             if (hex.size() > kHexLen) return {}; // too long, not a sha-256
         } else if (!hex.empty()) {
-            break; // hash ended, e.g. "<hash>  Astraeus.exe"
+            break; // hash ended, e.g. "<hash>  AryanIsland.exe"
         }
     }
     return hex.size() == kHexLen ? hex : std::string();
@@ -114,7 +114,7 @@ std::wstring SelfDir(std::wstring* exe = nullptr) {
 
 bool Swap(const std::string& data) { // write new exe beside us, rename ourselves aside, move new in
     std::wstring exe, dir = SelfDir(&exe);
-    std::wstring neu = dir + L"\\Astraeus.new", old = dir + L"\\Astraeus.old";
+    std::wstring neu = dir + L"\\AryanIsland.new", old = dir + L"\\AryanIsland.old";
     HANDLE f = CreateFileW(neu.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
     if (f == INVALID_HANDLE_VALUE) return false; // read-only folder, e.g. program files without admin
     DWORD put = 0;
@@ -137,7 +137,7 @@ bool Swap(const std::string& data) { // write new exe beside us, rename ourselve
 }
 
 constexpr wchar_t kUninstall[] = L"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall";
-constexpr wchar_t kWingetEntry[] = L"Icetist.Astraeus_"; // winget names its entry <package id>_<source>
+constexpr wchar_t kWingetEntry[] = L"aaryaninvincible.AryanIsland_"; // winget names its entry <package id>_<source>
 constexpr DWORD kKeyName = 256;
 
 std::wstring RegText(HKEY key, const wchar_t* sub, const wchar_t* name) {
@@ -258,7 +258,7 @@ void Updater::Check(HWND notify, UINT msg, bool manual) {
 std::wstring Updater::Applied() const { return impl ? impl->tag : L""; }
 
 bool FinishUpdate() { // run at launch: remove the renamed old exe, true if we were just updated
-    std::wstring old = SelfDir() + L"\\Astraeus.old";
+    std::wstring old = SelfDir() + L"\\AryanIsland.old";
     if (GetFileAttributesW(old.c_str()) == INVALID_FILE_ATTRIBUTES) return false;
     for (int i = 0; i < 10 && !DeleteFileW(old.c_str()); ++i) ::Sleep(200); // old process may still be exiting
     return true;

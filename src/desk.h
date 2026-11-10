@@ -9,7 +9,7 @@
 
 #include "mixer.h"
 
-// the mixer's groups, chat mix, ducking and profiles: one setup shared by astraeus and halobar, applied by whichever runs first
+// the mixer's groups, chat mix, ducking and profiles: one setup shared by aryan_island and halobar, applied by whichever runs first
 namespace sys {
 
 struct DeskGroup {

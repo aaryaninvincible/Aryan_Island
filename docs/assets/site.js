@@ -142,7 +142,7 @@ const lightUp = (items, onPick) => {
     },
     {
       icon: "✨",
-      title: "Astraeus · Liquid Glass Edition",
+      title: "Aryan Island · Liquid Glass Edition",
       sub: "Developed by aaryaninvincible · Native C++20",
       badge: "#FF7300 · #00F3FF",
       expanded: false

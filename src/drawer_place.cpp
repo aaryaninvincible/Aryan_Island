@@ -94,7 +94,7 @@ bool Drawer::AppIn(const RECT& area) const {
         GetClassNameW(w, cls, 40);
         for (const wchar_t* skip : {L"Progman", L"WorkerW", L"Shell_TrayWnd", L"Shell_SecondaryTrayWnd"})
             if (!wcscmp(cls, skip)) return TRUE; // the desktop and taskbars
-        if (!wcsncmp(cls, L"HaloBar", 7) || !wcsncmp(cls, L"Astraeus", 8)) return TRUE;
+        if (!wcsncmp(cls, L"HaloBar", 7) || !wcsncmp(cls, L"AryanIsland", 11)) return TRUE;
         BOOL cloaked = FALSE;
         if (SUCCEEDED(DwmGetWindowAttribute(w, DWMWA_CLOAKED, &cloaked, sizeof(cloaked))) && cloaked) return TRUE; // another desktop, a suspended app
         RECT r{}, hit{};
@@ -214,7 +214,7 @@ void Drawer::BuildStrips() {
         wc.lpfnWndProc = StripProc;
         wc.hInstance = inst;
         wc.hCursor = LoadCursorW(nullptr, IDC_ARROW);
-        wc.lpszClassName = L"AstraeusStrip";
+        wc.lpszClassName = L"AryanIslandStrip";
         registered = RegisterClassExW(&wc) != 0;
     }
     struct Ctx { Drawer* self; HINSTANCE inst; };
@@ -229,7 +229,7 @@ void Drawer::BuildStrips() {
         int x, y, w, h;
         if (d->edgeNow == 0) { w = along, h = deep; x = r->left + (r->right - r->left - w) / 2; y = r->top; }
         else { w = deep, h = along; x = d->edgeNow == 1 ? r->left : r->right - w; y = r->top + (r->bottom - r->top - h) / 2; }
-        HWND sw = CreateWindowExW(WS_EX_TOPMOST | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE | WS_EX_NOREDIRECTIONBITMAP, L"AstraeusStrip", L"",
+        HWND sw = CreateWindowExW(WS_EX_TOPMOST | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE | WS_EX_NOREDIRECTIONBITMAP, L"AryanIslandStrip", L"",
                                   WS_POPUP, x, y, w, h, nullptr, nullptr, c->inst, nullptr); // no surface, nothing drawn, just catches the mouse
         if (sw) {
             SetWindowLongPtrW(sw, GWLP_USERDATA, (LONG_PTR)d->hwnd);
@@ -311,7 +311,7 @@ void Drawer::SyncHide() {
     }
 }
 
-HMONITOR Drawer::Refuge() const { // every screen mode: a screen with astraeus on it and no game in front, the main one first
+HMONITOR Drawer::Refuge() const { // every screen mode: a screen with aryan_island on it and no game in front, the main one first
     if (screensNow != 1) return nullptr;
     HMONITOR main = MonitorFromPoint({0, 0}, MONITOR_DEFAULTTOPRIMARY), best = nullptr;
     for (HWND s : strips) {
@@ -363,7 +363,7 @@ bool Drawer::Overlay(HWND w) {
     if (!IsWindowVisible(w) || IsIconic(w)) return true; // nothing on screen to be fullscreen with
     wchar_t cls[40] = {};
     GetClassNameW(w, cls, 40);
-    if (!wcsncmp(cls, L"HaloBar", 7) || !wcsncmp(cls, L"Astraeus", 8)) return true; // halobar's dock and menus, or one of ours
+    if (!wcsncmp(cls, L"HaloBar", 7) || !wcsncmp(cls, L"AryanIsland", 11)) return true; // halobar's dock and menus, or one of ours
     LONG ex = GetWindowLongW(w, GWL_EXSTYLE);
     if (ex & (WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE)) return true; // game bars, recorders, chat overlays: they float over apps, they aren't one
     if ((ex & WS_EX_LAYERED) && (ex & WS_EX_TRANSPARENT)) return true; // a click-through layer the size of the screen (geforce, discord, steam)

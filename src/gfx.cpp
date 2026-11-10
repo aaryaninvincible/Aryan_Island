@@ -179,7 +179,7 @@ bool Init(const std::wstring& fontDir) {
     if (g->textFonts) g->textFam = FirstFam(g->textFonts.Get(), L"Outfit");
     g->lineFam = FirstFam(g->iconLine.Get(), nullptr); // icon fonts have one family, take it
     g->fillFam = FirstFam(g->iconFill.Get(), nullptr);
-    if (!g->iconLine || !g->iconFill) OutputDebugStringW(L"Astraeus: icon fonts missing\n"); // non-fatal, icons render as tofu
+    if (!g->iconLine || !g->iconFill) OutputDebugStringW(L"Aryan Island: icon fonts missing\n"); // non-fatal, icons render as tofu
     return true;
 }
 
