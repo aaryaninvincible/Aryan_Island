@@ -1,0 +1,161 @@
+#pragma once
+#include <windows.h>
+#include <d3d11.h>
+#include <dcomp.h>
+#include <dxgi1_3.h>
+#include <algorithm>
+#include <memory>
+
+#include "access.h"
+#include "history.h"
+#include "lyricview.h"
+#include "model.h"
+#include "theme.h"
+#include "pages.h"
+#include "stageprefs.h"
+#include "ui.h"
+
+// Fullscreen ambient player: the album art big over drifting audio-reactive light, controls that fade out when the mouse rests.
+// Built when opened from the media page and torn down on exit, so it costs nothing the rest of the time.
+// With two screens a pair of them: one shows the song, the other its lyrics.
+class Stage {
+public:
+    enum Role { kWhole, kCover, kLyrics }; // one screen, or one half of the pair
+    Stage(Model& model, HMONITOR mon, bool focus = true);
+    ~Stage();
+    Stage(const Stage&) = delete;
+    Stage& operator=(const Stage&) = delete;
+
+    bool Ok() const { return ctx != nullptr; }
+    bool Done() const { return done; } // user left, owner drops it
+    bool Leaving() const { return leaving; } // on its way out: the panel can come back under it
+    HANDLE Wait() const { return leaving && leaveTick ? leaveTick : frameWait; } // vsync waitable, the main loop sleeps on it; a timer while leaving
+    void Frame(const Theme& media);
+    HMONITOR Screen() const { return screen; }
+    void SetRole(Role r); // the pair split or swapped: a breath of dark over the change
+    void Leave(); // the user is done: shrink back into the bezel, then go; one of a pair takes the other along
+
+private:
+    static LRESULT CALLBACK Proc(HWND, UINT, WPARAM, LPARAM);
+    LRESULT Handle(UINT msg, WPARAM wp, LPARAM lp);
+    bool MakeDev(UINT pxW, UINT pxH);
+    struct Glass; // live desktop blur behind the stage, glass appearance only
+    Glass* glass = nullptr;
+    bool OpenGlass(UINT pxW, UINT pxH);
+    void FreeGlass();
+    bool GlassLeave(float seconds, float cx, float cy); // the same, run by windows' compositor in the glass look
+    bool leaving = false;
+    double leaveAt = 0;
+    HANDLE leaveTick = nullptr; // paces the loop while the compositor plays the exit: nothing is presented then
+    void SyncCover();
+    void SyncTheme(const Theme& media, float dt);
+    void Backdrop(double now);
+    void Clock(float y, float k);
+    enum EditPart { kPartClock, kPartLyrics, kPartText, kPartCover, kEditParts }; // the topmost first
+    void Player(float show, float lyr);
+    void SyncLyrics(double now);
+    D2D1_RECT_F LyricRect() const; // the column the lyrics scroll in, right of the cover
+    float LyricSize() const;
+    void Words(); // the lyrics half of a pair: only the words, the whole screen theirs
+    void Keys(UINT vk); // the two screen keys
+    float K() const { return std::clamp(H / 900.0f, 0.8f, 1.6f); }
+    HMONITOR screen = nullptr;
+    Role role = kWhole;
+    Role styled = kWhole; // the role the words were styled for
+    double roleAt = -10; // when the halves last changed
+    const wchar_t* hint = nullptr; // a word about what a key just did, fading
+    double hintAt = -10;
+    std::wstring hintWords; // when that word has a number in it
+    void NextLyrics(); // these lyrics are wrong: the next version
+    void LyricsChoice(float show); // the faint mark in the corner, only while the controls are up
+    void LyricsMenu(); // and what it opens: every source's version, and none
+    D2D1_RECT_F ChoiceBox() const;
+    bool ChoiceShows() const { return !lyrKey.empty() && role != kCover && model.stageLyrBtn; }
+    D2D1_RECT_F EditBox() const; // the pencil, beside that mark
+    void EditButton(float show);
+    bool editing = false; // the layout is being arranged: stage_edit.cpp
+    int editTab = 0, editDrag = -1; // which version; what's held, a part times two, plus one by its corner
+    StagePrefs::Shape shapeNow[2]; // what's on screen: it glides after what's kept, only while editing
+    float textLaid[2] = {1, 1}, clockLaid[2] = {1, 1}; // type is laid out at this scale; on the way to another it's only drawn bigger, nothing laid out anew each frame
+    int editPart = kPartCover, editPage = 0, editPageNth = 0; // what's picked, and the panel's page; each opening of a page fades in afresh
+    History editHist; // both versions and the scene's switches: undo and redo
+    int editRun = 0; // bumps as the editor opens: its undo starts afresh
+    History::Snap EditSnap() const;
+    void EditLoad(const History::Snap& s);
+    bool barAuto = true, barLeft = false; // the panel: keeping clear of what's picked by itself, and on which side
+    float timesNow = 1; // the seek line's times, this layout's
+    float lyrLaidW = 0; // the lyrics wrap at this width: the column can move on while it's held, they re-wrap once it's let go
+    bool editSnapX = false, editSnapY = false; // caught on a screen's middle
+    LPCWSTR editCursor = nullptr; // over a part: how it moves
+    StagePrefs::Shape editFrom;
+    D2D1_POINT_2F editMid{}, barAt{-1, -1}, barGrab{};
+    D2D1_SIZE_F editSize{};
+    bool barHeld = false;
+    D2D1_RECT_F partCover{}, partText{}, partLyrics{}, partClock{}; // where they landed this frame
+    void StartEdit();
+    void EndEdit();
+    void EditNudge(int dx, int dy, bool big); // the arrows: the picked part, a little
+    bool TakeKey(UINT vk); // a two screen key is being picked: this one's it
+    D2D1_RECT_F BarRect(float show);
+    void EditParts(const D2D1_RECT_F& bar, float show);
+    void EditPage(const D2D1_RECT_F& body, bool live);
+    void EditPanel(const D2D1_RECT_F& bar, bool canWith, bool covered);
+    void EditLayer(bool canWith, float show);
+    bool lyrMenu = false; // that list is open
+    int lyrMenuNth = 0; // each opening fades in afresh
+    bool lyrCycling = false; // asked for another version, not back yet
+    bool lyrQuiet = false; // picked from the list: it shows in the words, no note needed
+    double lyrCycleAt = 0;
+    std::shared_ptr<const sys::Lyrics> lyrCycleFrom;
+    void Seek(const D2D1_RECT_F& r, float show);
+
+    Model& model;
+    HWND hwnd = nullptr;
+    float scale = 1, W = 0, H = 0; // dips
+    bool done = false;
+    double lastFrame = 0, lastMove = -10, openedAt = 0;
+    POINT lastPt = {-1, -1};
+    float preview = -1; // seek drag preview
+    bool cursorGone = false; // hidden after the mouse rests
+
+    LyricView lyrics; // only for songs from music apps and sites, when lrclib has them synced
+    std::wstring lyrKey;
+    std::shared_ptr<const sys::Lyrics> lyrDoc;
+    double lyrAsked = -1, lyrPoll = 0, lyrKeyAt = 0;
+    float lyrMix = 0; // 0 the classic layout, 1 the cover on the left with the lyrics beside it
+
+    float left = 0, right = 0, slow = 0, beat = 0; // eased channel levels, running average, beat pulse
+    float frameDt = 1 / 60.0f;
+    double lastBeat = 0;
+    static constexpr int kBlobs = 6;
+    Swell swell; // soft light rising along the bottom of the screen
+    Waveform wave; // or bars across the room, with the waveform look
+
+    int mode = 0; // the panel's appearance when the stage opened: 0 dark, 1 light, 2 glass, 3 custom
+    bool LightRoom() const { return mode == 1 || (mode == 3 && theme::Luma(look.bg) >= 0.18f); }
+    double nudgeAt = -10; // when [ or ] last moved the lyrics, for the little readout
+    float shade = 0; // glass over a bright desktop: extra dark tint so white text reads
+    Theme look, lookFrom, lookTo; // that appearance in the song's hue, crossfading from the last song's
+    float lookT = 1;
+    bool lookSet = false;
+    bool artSeeded = false; // colors come from this song's own cover, the panel isn't drawing to update them
+    Seed artSeed;
+    Input input;
+    Ui ui;
+    Access access; // what a screen reader sees
+
+    ComPtr<ID3D11Device> d3d;
+    ComPtr<ID2D1DeviceContext> ctx;
+    ComPtr<IDXGISwapChain2> swap;
+    ComPtr<ID2D1Bitmap1> backBuf;
+    ComPtr<IDCompositionDevice> dcomp;
+    ComPtr<IDCompositionTarget> target;
+    ComPtr<IDCompositionVisual> visual;
+    HANDLE frameWait = nullptr;
+    std::unique_ptr<Canvas> canvas;
+
+    uint64_t coverId = ~0ull;
+    ComPtr<ID2D1Bitmap1> cover;
+    ComPtr<ID2D1Bitmap> coverBlur;
+    ComPtr<ID2D1Bitmap> coverArt; // the album art background: barely softened, baked only while its switch is on
+};

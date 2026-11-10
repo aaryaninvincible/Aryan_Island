@@ -1,0 +1,75 @@
+#pragma once
+#include <string>
+
+#include "model.h"
+#include "theme.h"
+#include "ui.h"
+
+struct PageCtx {
+    Ui& ui;
+    Model& m;
+    const Theme& shell;
+    const Theme& media;
+    ID2D1Bitmap* cover;
+    ID2D1Bitmap* coverBlur; // blurred art for page backdrop
+    float artFade; // 0..1 crossfade on cover change
+    D2D1_RECT_F area; // page content rect below tabs
+    bool wantClose = false; // page asks drawer to retract
+    bool wantStage = false; // media page asks for the fullscreen stage
+    int wantPage = -1; // a page asks to switch to another, e.g. the home media card to the media page
+    const wchar_t* hint = nullptr; // a short tip the drawer shows just outside the panel, next to hintRect
+    D2D1_RECT_F hintRect{};
+    float hintFade = 0;
+    D2D1_RECT_F spotTiles{}, spotCover{}, spotAdd{}, spotSettings{}; // where the tour points, as the page drew them
+    ID2D1Bitmap* coverPrev = nullptr; // the cover before the track changed, shown for the first half of the flip
+    float flip = 1; // 0..1 the art turning over to the new cover
+    float backdrop = 0; // 0..1 the album art fills the panel behind the media page: its card goes see-through
+};
+
+void VizGlow(PageCtx& p, const D2D1_RECT_F& r, float scale, const Theme& t); // audio-reactive glow behind art, in t's accent
+struct Swell { // soft blobs of light that rise from the bottom and swell with the music
+    static constexpr int kMax = 8;
+    float level[kMax] = {}, gain[kMax] = {}, heat = 0; // eased blob sizes, each blob's recent loudest, overall warmth
+};
+bool StepSwell(Swell& s, Model& m, float dt, bool playing, int blobs); // true while anything still glows
+struct Waveform { // bars across the player, mirrored about its middle: bass on the left, treble on the right
+    static constexpr int kBars = 48;
+    float level[kBars] = {}, gain[kBars] = {};
+};
+bool StepWave(Waveform& w, Model& m, float dt, bool playing); // true while any bar still stands
+void DrawWave(Canvas& c, const Waveform& w, const D2D1_RECT_F& r, const Theme& t, float alpha, const D2D1_ROUNDED_RECT* in = nullptr);
+void DrawSwell(Canvas& c, const Swell& s, int blobs, const D2D1_RECT_F& r, const Theme& t, double now, const D2D1_ROUNDED_RECT* in = nullptr); // glows up from r's bottom, in: kept inside a card
+void WaveLine(Canvas& c, float a0, float a1, float cy, float amp, double now, Color col, float width, float wavelen); // the played part of the seek line, rippling
+
+void DrawHome(PageCtx& p);
+void DrawMedia(PageCtx& p);
+void DrawSys(PageCtx& p);
+void DrawNet(PageCtx& p);
+void DrawTools(PageCtx& p);
+void DrawShelf(PageCtx& p); // files and notes dropped on the island
+void DrawWidgetsPage(PageCtx& p); // the board of widgets
+void DrawWidgetStudio(PageCtx& p); // arranging and adding to it, over the wallpaper; area: the screen. wantClose when it's done
+void DrawTileStudio(PageCtx& p); // the same for the tools page's tiles
+void DrawPageStudio(PageCtx& p); // and for the pages on the rail
+void ForgetShelfArt(); // the device is going: drop the shelf's preview bitmaps
+void ShelfClosed(); // the panel went up: the shelf's menus and open card go with it
+void ShelfToast(const wchar_t* text); // a word at the bottom of the shelf page, on its next frame
+void FlipArt(PageCtx& p, const D2D1_RECT_F& r, float radius, float iconPx); // album art that turns over on a track change
+float DrawPrefs(PageCtx& p, const D2D1_RECT_F& area, bool live, bool tall); // the newer settings cards, returns their height
+void DrawBt(PageCtx& p, float t); // bluetooth menu overlay, t = open anim 0..1
+void DrawWifi(PageCtx& p, float t); // wi-fi network picker overlay, same sheet style
+void DrawShare(PageCtx& p, const D2D1_RECT_F& view); // shared-audio tab inside the bluetooth sheet
+void DrawSettings(PageCtx& p, float t); // astraeus settings sheet
+void DrawCalendar(PageCtx& p, float t); // a month at a glance, from the weather card
+void DrawMixer(PageCtx& p, float t); // per-app volume, from the volume slider
+ID2D1Bitmap* AppIcon(Canvas& c, const sys::MixApp& a); // an app's icon as a bitmap on this device, made once
+
+namespace fmt {
+std::wstring Rate(double bps); // auto-scaled bytes/s units
+std::wstring Clock(double seconds);
+std::wstring Upper(std::wstring s);
+std::wstring Temp(double c, bool fahr);
+std::wstring Gb(double gb);
+int WxIcon(int code, bool day);
+const wchar_t* WxText(int code);
+}

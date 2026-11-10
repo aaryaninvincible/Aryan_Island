@@ -1,0 +1,34 @@
+#pragma once
+#include <string>
+#include <vector>
+
+#include "gfx.h"
+
+struct Config {
+    float panW = 900; // dips, defaults mirror kDefault ini
+    float panH = 340;
+    float fillet = 26; // concave curve where panel meets screen top
+    float corner = 34;
+    bool hoverOpen = true;
+    int hoverMs = 70;
+    float hoverW = 240; // hot zone width at screen top while closed
+    int closeMs = 450;
+    bool hideFull = true;
+    UINT hotMods = MOD_WIN | MOD_ALT, hotKey = 'A'; // the shortcut that opens the panel, hotKey 0 = none
+    int gpuIdleSec = 8; // drop d2d resources after closed this long
+    bool perfLog = false;
+
+    bool wallTheme = false; // false = use themeCol as seed (#FF7300 Portfolio orange default)
+    Color themeCol = Color::Rgb(0xFF7300);
+    bool albumCol = true;
+    bool viz = true;
+
+    bool weather = true;
+    bool fahr = false;
+    bool autoUpdate = true; // install new github releases silently
+    bool publicIp = true; // ask a web service for the public ip on the network page
+
+    std::vector<std::wstring> warns; // parse problems, shown to user, never fatal
+
+    static Config Load(const std::wstring& path);
+};
