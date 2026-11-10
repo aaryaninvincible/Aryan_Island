@@ -20,6 +20,14 @@ struct BinInfo {
 BinInfo Bin();
 void EmptyBin(HWND owner); // windows asks first, as it does from the desktop
 
+struct RamCleanResult {
+    double freedMb = 0;
+    int beforePct = 0, afterPct = 0;
+    int procsTrimmed = 0;
+    double usedAfterGb = 0, totalGb = 0;
+};
+RamCleanResult CleanRam(); // trims unused working sets across accessible processes and returns freed memory stats
+
 struct UpdateCount {
     int system = -1, apps = -1; // windows' own and installed packages; -1 not known yet
     bool busy = false;

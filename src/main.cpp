@@ -427,6 +427,13 @@ LRESULT CALLBACK HostProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
                 app->drawer->Peek(L"Timer finished", detail); // in-app drop banner
                 Notify(L"Timer finished", detail.c_str()); // plus system toast
             }
+            if (app->model->ramAutoCleaned) {
+                app->model->ramAutoCleaned = false;
+                const auto& r = app->model->lastRamClean;
+                std::wstring detail = L"Freed " + std::to_wstring((int)std::lround(r.freedMb)) + L" MB  ·  " +
+                                      std::to_wstring(r.beforePct) + L"% \u2192 " + std::to_wstring(r.afterPct) + L"%";
+                app->drawer->Peek(L"Auto RAM Cleaner", detail, glyph::Rocket);
+            }
         }
         return 0;
     case WM_APP_UPDATE:
@@ -458,6 +465,13 @@ LRESULT CALLBACK HostProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
         switch (LOWORD(wp)) {
         case kOpen: app->drawer->Toggle(); break;
         case kSettings: app->drawer->ShowSettings(); break;
+        case kBoostRam: {
+            auto r = app->model->BoostRam();
+            std::wstring detail = L"Freed " + std::to_wstring((int)std::lround(r.freedMb)) + L" MB  ·  " +
+                                  std::to_wstring(r.beforePct) + L"% \u2192 " + std::to_wstring(r.afterPct) + L"%";
+            app->drawer->Peek(L"RAM Boosted", detail, glyph::Rocket);
+            break;
+        }
         case kConfig: ShellExecuteW(nullptr, L"open", L"notepad.exe", (L"\"" + app->cfgPath + L"\"").c_str(), nullptr, SW_SHOWNORMAL); break; // edit ini in notepad
         case kStartup: SetStartup(!StartupOn()); break;
         case kRestart: Restart(app->exePath); break;

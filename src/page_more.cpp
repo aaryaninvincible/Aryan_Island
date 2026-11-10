@@ -44,37 +44,62 @@ void GaugeCell(PageCtx& p, const D2D1_RECT_F& r, const Cell& cell, int index) {
     Canvas& c = p.ui.C();
     const Theme& t = p.shell;
     const float radius = 50;
-    D2D1_POINT_2F center = {(r.left + r.right) / 2, r.top + 96}; // gauge center near top of cell
+    D2D1_POINT_2F center = {(r.left + r.right) / 2, r.top + 88}; // gauge center near top of cell
+    bool isRam = cell.glyph == glyph::Ram;
+    Ui::Hit hit = isRam ? p.ui.Button(Ui::Id("sys.ram.boost"), r) : Ui::Hit{};
+    float hov = isRam ? p.ui.Smooth(Ui::Id("sys.ram.hov"), hit.hover ? 1.0f : 0.0f, 16) : 0.0f;
+    if (hov > 0.01f) c.Glow(center, radius * 1.35f, radius * 1.35f, t.accent.Alpha(0.18f * hov));
     w::Gauge(p.ui, t, Ui::Id("sys.g", index), center, radius, 6, cell.value);
-    c.Icon(cell.glyph, {center.x, center.y - 16}, 20, t.accent); // icon sits above value inside ring
+    c.Icon(hov > 0.5f ? glyph::Rocket : cell.glyph, {center.x, center.y - 16}, 20, hov > 0.5f ? t.accentHi : t.accent); // icon sits above value inside ring
     c.Text(cell.big, Rect(center.x - radius, center.y - 4, radius * 2, 28), Weight::Light, 22, t.text, Align::Center);
-    c.Text(cell.name, Rect(r.left + 6, r.top + 170, Width(r) - 12, 20), Weight::Medium, 14, t.text, Align::Center); // label + detail below gauge
-    c.Text(cell.detail, Rect(r.left + 6, r.top + 192, Width(r) - 12, 18), Weight::Light, 11.5f, t.textDim, Align::Center);
+    c.Text(hov > 0.5f ? L"Boost RAM" : cell.name, Rect(r.left + 6, r.top + 160, Width(r) - 12, 20), Weight::Medium, 14, hov > 0.5f ? t.accentHi : t.text, Align::Center); // label + detail below gauge
+    bool recentClean = isRam && p.m.lastRamCleanTick > 0 && (GetTickCount64() - p.m.lastRamCleanTick < 5000);
+    if (recentClean) p.ui.KeepAlive();
+    std::wstring sub = recentClean ? (L"Freed " + std::to_wstring((int)std::lround(p.m.lastRamClean.freedMb)) + L" MB") : (hov > 0.5f ? std::wstring(L"Click to clean") : cell.detail);
+    c.Text(sub, Rect(r.left + 4, r.top + 181, Width(r) - 8, 18), recentClean ? Weight::Medium : Weight::Light, 11.5f, recentClean ? t.accentHi : t.textDim, Align::Center);
+    if (isRam && hit.clicked) p.m.BoostRam();
 }
 
 void Procs(PageCtx& p, const D2D1_RECT_F& r) {
     Canvas& c = p.ui.C();
     const Theme& t = p.shell;
     w::Card(p.ui, t, r);
-    c.TextSp(L"TOP PROCESSES", Rect(r.left + 18, r.top + 16, Width(r) - 36, 16), Weight::Medium, 10, t.textLow, 1.4f);
+    c.TextSp(L"TOP PROCESSES", Rect(r.left + 18, r.top + 16, 130, 16), Weight::Medium, 10, t.textLow, 1.4f);
+    bool byRam = p.m.procSortByRam != 0;
+    bool recentBoost = p.m.lastRamCleanTick > 0 && (GetTickCount64() - p.m.lastRamCleanTick < 4000);
+    if (recentBoost) p.ui.KeepAlive();
+    std::wstring boostLbl = recentBoost ? (L"-" + std::to_wstring((int)std::lround(p.m.lastRamClean.freedMb)) + L" MB") : L"Boost RAM";
+    if (sheet::Act(p.ui, t, Ui::Id("sys.boost.btn"), Rect(r.right - 200, r.top + 10, 88, 26), boostLbl, true, false, true)) {
+        p.m.BoostRam();
+    }
+    if (sheet::Act(p.ui, t, Ui::Id("sys.sort.btn"), Rect(r.right - 106, r.top + 10, 56, 26), byRam ? L"RAM" : L"CPU", false, false, true)) {
+        p.m.SetPref(p.m.procSortByRam, L"ProcSortByRam", byRam ? 0 : 1);
+    }
     if (w::IconBtn(p.ui, t, Ui::Id("sys.taskmgr"), {r.right - 26, r.top + 23}, 28, glyph::OpenNew, 15)) { // the whole list, in task manager
         p.wantClose = true;
         sys::OpenUri(L"taskmgr.exe");
     }
+    std::vector<sys::ProcRow> list = p.m.procs;
+    if (byRam && list.size() > 1) {
+        std::sort(list.begin(), list.end(), [](const sys::ProcRow& a, const sys::ProcRow& b) { return a.memBytes > b.memBytes; });
+    }
+    uint64_t topMem = 1;
+    if (byRam && !list.empty()) topMem = (std::max<uint64_t>)(1, list.front().memBytes);
     float y = r.top + 42; // rows start under header
     const float rowH = 40;
-    for (size_t i = 0; i < p.m.procs.size() && y + rowH <= r.bottom - 6; ++i, y += rowH) { // stop when next row would overflow card
-        const sys::ProcRow& pr = p.m.procs[i];
+    for (size_t i = 0; i < list.size() && y + rowH <= r.bottom - 6; ++i, y += rowH) { // stop when next row would overflow card
+        const sys::ProcRow& pr = list[i];
         float x0 = r.left + 18, x1 = r.right - 18;
         c.Text(pr.name, Rect(x0, y, x1 - x0 - 70, 20), Weight::Medium, 13, t.text); // name leaves room for cpu % on right
-        c.Text(w::Pct((float)pr.cpu), Rect(x1 - 70, y, 70, 20), Weight::Medium, 12.5f, t.text, Align::Right);
-        c.Text(fmt::Gb(pr.memBytes / 1073741824.0), Rect(x1 - 90, y + 18, 90, 14), Weight::Light, 10.5f, t.textLow, Align::Right); // bytes -> gb
-        float bar = p.ui.Soft(Ui::Id("sys.bar", (int)i), anim::Clamp01((float)pr.cpu)); // eased bar so values don't jump
+        c.Text(w::Pct((float)pr.cpu), Rect(x1 - 70, y, 70, 20), Weight::Medium, 12.5f, byRam ? t.textDim : t.text, Align::Right);
+        c.Text(fmt::Gb(pr.memBytes / 1073741824.0), Rect(x1 - 90, y + 18, 90, 14), byRam ? Weight::Medium : Weight::Light, 10.5f, byRam ? t.accentHi : t.textLow, Align::Right); // bytes -> gb
+        float ratio = byRam ? (float)((double)pr.memBytes / (double)topMem) : (float)pr.cpu;
+        float bar = p.ui.Soft(Ui::Id("sys.bar", (int)i), anim::Clamp01(ratio)); // eased bar so values don't jump
         float by = y + 26; // bar under name line
         c.Line({x0, by}, {x1 - 100, by}, t.track, 3);
         if (bar > 0.003f) c.Line({x0, by}, {x0 + (x1 - 100 - x0) * bar, by}, t.accent, 3); // skip near-zero to avoid cap dot
     }
-    if (p.m.procs.empty()) c.Text(L"Measuring…", Rect(r.left + 18, r.top + 46, 200, 20), Weight::Light, 12.5f, t.textDim); // worker hasn't sampled procs yet
+    if (list.empty()) c.Text(L"Measuring…", Rect(r.left + 18, r.top + 46, 200, 20), Weight::Light, 12.5f, t.textDim); // worker hasn't sampled procs yet
 }
 
 void InfoRow(Canvas& c, const Theme& t, float x, float y, float wdt, const wchar_t* label, const std::wstring& value) {
@@ -140,7 +165,18 @@ void DrawSys(PageCtx& p) {
 
     float cw = (Width(left) - 20) / (float)count; // split card evenly among 2 or 3 gauges
     for (size_t i = 0; i < count; ++i)
-        GaugeCell(p, Rect(left.left + 10 + cw * i, left.top + 10, cw, Height(left) - 20), cells[i], (int)i);
+        GaugeCell(p, Rect(left.left + 10 + cw * i, left.top + 6, cw, Height(left) - 44), cells[i], (int)i);
+
+    D2D1_RECT_F bar = {left.left + 18, left.bottom - 34, left.right - 18, left.bottom - 8};
+    bool autoOn = p.m.autoRamClean != 0;
+    if (w::Chip(p.ui, p.shell, Ui::Id("sys.ram.auto"), Rect(bar.left, bar.top, (Width(bar) - 8) * 0.54f, Height(bar)), autoOn ? L"Auto-Clean >85%: On" : L"Auto-Clean >85%: Off", autoOn)) {
+        p.m.SetPref(p.m.autoRamClean, L"AutoRamClean", autoOn ? 0 : 1);
+    }
+    bool cleaned = p.m.lastRamCleanTick > 0 && (GetTickCount64() - p.m.lastRamCleanTick < 5000);
+    std::wstring cleanTxt = cleaned ? (L"Freed " + std::to_wstring((int)std::lround(p.m.lastRamClean.freedMb)) + L" MB (" + std::to_wstring(p.m.lastRamClean.beforePct) + L"%→" + std::to_wstring(p.m.lastRamClean.afterPct) + L"%)") : L"Clean RAM Now";
+    if (w::Chip(p.ui, p.shell, Ui::Id("sys.ram.now"), Rect(bar.left + (Width(bar) - 8) * 0.54f + 8, bar.top, (Width(bar) - 8) * 0.46f, Height(bar)), cleanTxt, cleaned)) {
+        p.m.BoostRam();
+    }
 
     Procs(p, tall ? D2D1_RECT_F{a.left, left.bottom + 12, a.right, a.bottom} : D2D1_RECT_F{left.right + 12, a.top, a.right, a.bottom});
 }
@@ -379,6 +415,16 @@ void Tile(PageCtx& p, int id, const D2D1_RECT_F& r) { // one quick tile: its sta
             if (u.system > 0) p.wantClose = true, sys::OpenUri(L"ms-settings:windowsupdate");
             else if (u.apps > 0) p.wantClose = true, ShellExecuteW(nullptr, L"open", L"cmd.exe", L"/k winget upgrade --all", nullptr, SW_SHOWNORMAL); // asked for: shown in a console, nothing hidden
             else m.updates.Check(m.notify, WM_APP_UPDATES), m.updateNow.busy = true;
+        }
+        break;
+    }
+    case Model::kTlRamClean: {
+        bool recent = m.lastRamCleanTick > 0 && (GetTickCount64() - m.lastRamCleanTick < 4500);
+        if (recent) ui.KeepAlive();
+        std::wstring sub = recent ? (L"Freed " + std::to_wstring((int)std::lround(m.lastRamClean.freedMb)) + L" MB")
+                                  : (w::Pct((float)m.stats.mem) + L" · Clean");
+        if (w::Tile(ui, t, uid, r, glyph::Rocket, label(L"Boost RAM", L"RAM"), sub, recent)) {
+            m.BoostRam();
         }
         break;
     }

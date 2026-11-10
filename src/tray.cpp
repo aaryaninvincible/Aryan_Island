@@ -28,8 +28,9 @@ struct Item {
     const wchar_t* label;
 };
 const Item kItems[] = {{kSettings, glyph::Settings, L"Settings"}, // reachable whatever pages and tiles are kept
+                       {kBoostRam, glyph::Rocket, L"Boost RAM"},
                        {kConfig, glyph::Edit, L"Edit config"}, // no "open": clicking the icon does that
-                       {kStartup, glyph::Rocket, L"Start with Windows"},
+                       {kStartup, glyph::Bolt, L"Start with Windows"},
                        {kUpdate, 0, L"Check for updates"},
                        {kSepCmd, 0, nullptr},
                        {kRestart, glyph::Restart, L"Restart"},

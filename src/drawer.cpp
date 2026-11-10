@@ -566,6 +566,11 @@ void Drawer::MoveDrag(float y) {
 void Drawer::EndDrag() {
     if (!dragging) return;
     dragging = false;
+    if (pressTo > 0 && std::fabs(dragX - dragX0) > 48 && std::fabs(dragX - dragX0) > std::fabs(dragY - dragY0) * 1.3f) { // horizontal swipe gesture across open panel switches pages
+        SetPage(model.PageAt(model.SlotOf(page) + (dragX < dragX0 ? 1 : -1)));
+        Open();
+        return;
+    }
     if (std::fabs(dragY - dragY0) < kTap) { // barely moved, treat as click
         if (pressTo <= 0) Open(); // click on strip opens
         Redraw();
@@ -671,6 +676,7 @@ LRESULT Drawer::Handle(UINT msg, WPARAM wp, LPARAM lp) {
         D2D1_POINT_2F p = ToDip(lp);
         TrackLeave();
         if (dragging) {
+            dragX = Side() ? p.y : p.x;
             MoveDrag(DepthOf(p));
             return 0;
         }
@@ -821,6 +827,7 @@ LRESULT Drawer::Handle(UINT msg, WPARAM wp, LPARAM lp) {
         if (!opened && spring.value < 1 && model.appKeyOnly && AppBelow()) return 0; // over an app with shortcut only: the bare strip opens nothing
         SetCapture(hwnd); // keep getting moves outside window while held
         if (!opened && spring.value < 1) {
+            dragX0 = dragX = Side() ? p.y : p.x;
             StartDrag(DepthOf(p)); // pull out from the strip
             return 0;
         }
@@ -830,7 +837,10 @@ LRESULT Drawer::Handle(UINT msg, WPARAM wp, LPARAM lp) {
         input.pressed = true;
         input.down = true;
         Frame(); // run ui now to see what was hit
-        if (ui.FreePress() && !Pinned()) StartDrag(DepthOf(p)); // press on empty area drags panel; pinned, it doesn't move
+        if (ui.FreePress() && !Pinned()) {
+            dragX0 = dragX = Side() ? p.y : p.x;
+            StartDrag(DepthOf(p)); // press on empty area drags panel; pinned, it doesn't move
+        }
         return 0;
     }
     case WM_LBUTTONUP:
@@ -857,14 +867,18 @@ LRESULT Drawer::Handle(UINT msg, WPARAM wp, LPARAM lp) {
     case WM_MOUSEWHEEL:
     case WM_MOUSEHWHEEL: {
         float notches = GET_WHEEL_DELTA_WPARAM(wp) / (float)WHEEL_DELTA; // in notches
+        if (!opened && !island && msg == WM_MOUSEWHEEL) { // gesture: scrolling on the collapsed bezel strip adjusts system volume + pops HUD pill
+            OnVolumeKey(notches > 0 ? VK_VOLUME_UP : VK_VOLUME_DOWN);
+            return 0;
+        }
         POINT sp = {GET_X_LPARAM(lp), GET_Y_LPARAM(lp)}; // wheel messages carry screen coordinates
         ScreenToClient(hwnd, &sp);
         D2D1_POINT_2F p = {sp.x / scale, sp.y / scale};
         D2D1_POINT_2F org = BodyOrg((std::clamp)(spring.value, 0.0f, Depth() + overshoot));
         bool rail = opened && Inside(RailBox(), {p.x - org.x, p.y - org.y}); // the rail as the frame draws it, any edge or layout
-        if (msg == WM_MOUSEHWHEEL && opened && !rail) return 0; // a sideways swipe means pages only over the rail
-        if (rail || (island && !opened)) {
-            WheelPages(msg == WM_MOUSEHWHEEL ? notches : -notches); // wheel down or swipe right: the next page
+        bool shiftWheel = msg == WM_MOUSEWHEEL && (GET_KEYSTATE_WPARAM(wp) & MK_SHIFT) != 0;
+        if (rail || (island && !opened) || (opened && (msg == WM_MOUSEHWHEEL || shiftWheel))) { // touchpad two-finger horizontal swipe or Shift+Wheel anywhere on open panel cycles pages
+            WheelPages(msg == WM_MOUSEHWHEEL ? notches : -notches);
             return 0;
         }
         input.wheel += notches; // accumulates till next frame
@@ -1221,6 +1235,26 @@ LRESULT Drawer::Handle(UINT msg, WPARAM wp, LPARAM lp) {
         if (opened) SetPage(model.PageAt(model.SlotOf(page) + ((int)wp == kRailKeyNext ? 1 : -1)));
         Redraw();
         return 0;
+    case WM_MBUTTONDOWN:
+        return 0;
+    case WM_MBUTTONUP: { // middle-click gesture: on closed strip/pill toggles Play/Pause (when track active) or Boosts RAM; on open panel Boosts RAM
+        if (!opened && model.hasTrack) {
+            model.media.PlayPause();
+            Peek(model.track.playing ? L"Paused" : L"Playing", model.track.title.empty() ? L"Media playback" : model.track.title,
+                 model.track.playing ? glyph::Pause : glyph::Play);
+            return 0;
+        }
+        auto r = model.BoostRam();
+        std::wstring detail = L"Freed " + std::to_wstring((int)std::lround(r.freedMb)) + L" MB  \u00B7  " +
+                              std::to_wstring(r.beforePct) + L"% \u2192 " + std::to_wstring(r.afterPct) + L"%";
+        if (opened) {
+            if (model.HasPage(Model::kPgSystem) && page != Model::kPgSystem) SetPage(Model::kPgSystem);
+            Redraw();
+        } else {
+            Peek(L"RAM Boosted", detail, glyph::Rocket);
+        }
+        return 0;
+    }
     case WM_RBUTTONDOWN:
         return 0;
     case WM_RBUTTONUP:
@@ -1230,6 +1264,10 @@ LRESULT Drawer::Handle(UINT msg, WPARAM wp, LPARAM lp) {
             Redraw();
         } else if (island && !peeking && !dragging && desk && !stage) { // the regular pill: into the long pill's editor, which asks first if neither place wears it
             PostMessageW(hwnd, kDeskEditMsg, 0, deskView ? Model::kEditFromDesk : Model::kEditFromApps);
+        } else if (!island && !peeking && !dragging && !stage) { // right-click gesture on collapsed strip: open directly to System & RAM Cleaner page
+            if (model.HasPage(Model::kPgSystem) && page != Model::kPgSystem) prevPage = page, page = Model::kPgSystem, pageT = 1;
+            pageSet = true;
+            Open();
         }
         return 0;
     case WM_APP_RADIOS:

@@ -41,9 +41,11 @@ No Electron, no web view, no runtime to install. Just one small native executabl
 ## ✨ Features
 
 - **Media player and fullscreen lyrics.** Album art, a visualizer that swells with the music, and a fullscreen player with time-synced lyrics that light up word by word, spread across two monitors if you have them.
+- **Native RAM Cleaner & Auto-Memory Optimizer (`Boost RAM`).** Reclaim hundreds of MBs of background working-set memory in one click from the System page (click the Memory ring gauge, the `Clean RAM Now` bar, or the `Boost RAM` button), the `Boost RAM` Tools tile, or the System Tray menu — plus automatic RAM optimization when memory exceeds 85% and a one-click `CPU / RAM` process sort toggle.
+- **Expanded Theme Studio (`Cyber`, `Aurora`, `OLED`, `Liquid Glass`).** Defaults to the signature Apple iOS / VisionOS Liquid Glass look (`#FF7300` primary orange + `#00F3FF` cyan refraction, multi-layer specular top/bottom edge highlights, and live Windows Composition backdrop blur), plus **Cyber** (neon cyberpunk obsidian), **Aurora** (frosted glass + animated starfield + emerald/violet borealis sheen), **OLED** (pitch-black `#000000` True AMOLED), **Dark**, **Light**, **Clear**, **Custom**, **Starfall**, and **HaloBar** looks.
+- **Mouse & Trackpad Gestures.** Scroll on the collapsed bezel strip to adjust volume with the live HUD pill; swipe horizontally with two fingers (`WM_MOUSEHWHEEL`), `Shift + Scroll`, or drag left/right anywhere on the open panel to switch pages; middle-click the strip or pill to toggle Play/Pause or Boost RAM; right-click the collapsed strip to jump straight to the System & RAM Cleaner page.
 - **Quick toggles and control centers.** Wi-Fi, Bluetooth, volume, brightness and a volume mixer, with devices and networks you connect to right in the panel.
 - **The island.** A small pill with what's playing over full-screen apps, or always on with the clock and two small widgets.
-- **Portfolio Liquid Glass Design System.** Defaults to the signature Apple iOS / VisionOS Liquid Glass look (`#FF7300` primary orange + `#00F3FF` cyan refraction, multi-layer specular top/bottom edge highlights, and live Windows Composition backdrop blur), alongside Dark, Light, Clear, Custom, Starfall, and HaloBar looks.
 - **Lightweight.** Nothing renders while closed, and the GPU is handed back seconds later. The numbers are under [Performance](#-performance).
 
 <details>

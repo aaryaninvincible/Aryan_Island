@@ -272,6 +272,60 @@ Theme Theme::From(Seed seed) {
         t.veil = t.bg;
         t.stars = true;
     }
+    if (seed.look == theme::kCyber) { // Cyberpunk: deep neon obsidian, hyper-vivid accents, electric dual-tone rims
+        float comp = std::fmod(h + 165.0f, 360.0f);
+        t.bg = Hsl(262, 0.62f, 0.042f);
+        t.card = Hsl(258, 0.48f, 0.085f).Alpha(0.92f);
+        t.cardHi = Hsl(254, 0.46f, 0.135f).Alpha(0.94f);
+        t.track = Hsl(256, 0.42f, 0.20f);
+        t.accent = Hsl(h, 0.96f, 0.64f);
+        t.accentHi = Hsl(h, 1.0f, 0.78f);
+        t.onAccent = Color{0.04f, 0.04f, 0.06f, 1};
+        t.text = Hsl(comp, 0.25f, 0.96f);
+        t.textDim = Hsl(comp, 0.22f, 0.74f);
+        t.textLow = Hsl(260, 0.20f, 0.52f);
+        t.hairTop = Hsl(comp, 0.92f, 0.66f, 0.46f);
+        t.hairBot = t.accent.Alpha(0.18f);
+        t.line = Hsl(comp, 0.75f, 0.62f, 0.16f);
+        t.sheen = t.accent.Alpha(0.12f);
+        t.veil = t.bg;
+    }
+    if (seed.look == theme::kAurora) { // Aurora Borealis: live frosted backdrop blur + starlight + emerald/violet borealis sheen
+        float borealis = 166.0f;
+        t.bg = Hsl(borealis, 0.65f, 0.055f).Alpha(0.28f);
+        t.card = Hsl(borealis, 0.50f, 0.90f).Alpha(0.12f);
+        t.cardHi = Hsl(borealis, 0.55f, 0.92f).Alpha(0.19f);
+        t.track = Hsl(borealis, 0.40f, 0.88f).Alpha(0.22f);
+        t.accent = Hsl(h, (std::max)(0.74f, 0.90f * k), 0.68f);
+        t.accentHi = Hsl(h, 0.92f, 0.82f);
+        t.text = Hsl(borealis, 0.16f, 0.98f);
+        t.textDim = Hsl(borealis, 0.18f, 0.84f);
+        t.textLow = Hsl(borealis, 0.14f, 0.72f);
+        t.hairTop = Hsl(borealis, 0.85f, 0.76f, 0.52f);
+        t.hairBot = Hsl(280, 0.75f, 0.72f, 0.18f);
+        t.line = Hsl(borealis, 0.60f, 0.80f, 0.16f);
+        t.sheen = Hsl(borealis, 0.85f, 0.74f, 0.22f);
+        t.veil = Hsl(borealis, 0.45f, 0.05f);
+        t.glass = true;
+        t.stars = true;
+    }
+    if (seed.look == theme::kOled) { // True AMOLED pitch black with razor-sharp luminous accent hairlines
+        t.bg = Color{0, 0, 0, 1};
+        t.card = Color{0.014f, 0.014f, 0.018f, 1};
+        t.cardHi = Color{0.038f, 0.038f, 0.048f, 1};
+        t.track = Color{0.09f, 0.09f, 0.11f, 1};
+        t.accent = Hsl(h, (std::max)(0.75f, 0.92f * k), 0.66f);
+        t.accentHi = Hsl(h, 0.95f, 0.80f);
+        t.onAccent = Color{0.03f, 0.03f, 0.04f, 1};
+        t.text = Color{0.98f, 0.98f, 0.99f, 1};
+        t.textDim = Color{0.72f, 0.72f, 0.76f, 1};
+        t.textLow = Color{0.46f, 0.46f, 0.50f, 1};
+        t.hairTop = t.accent.Alpha(0.44f);
+        t.hairBot = t.accent.Alpha(0.12f);
+        t.line = t.accent.Alpha(0.16f);
+        t.sheen = t.accent.Alpha(0.06f);
+        t.veil = Color{0, 0, 0, 1};
+    }
     if (seed.chroma < 0.08f) { // black and white art or wallpaper: a colored accent would invent a mood that isn't there
         bool lightLook = seed.look == 1 || (seed.look == 2 && theme::TintIsPale(seed.tint));
         t.accent = Hsl(h, 0, lightLook ? 0.20f : 0.86f);

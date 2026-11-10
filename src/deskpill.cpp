@@ -169,6 +169,15 @@ LRESULT DeskPill::Handle(UINT msg, WPARAM wp, LPARAM lp) {
         if (!editing && !leaving && was && onOpen) onOpen();
         return 0;
     }
+    case WM_MBUTTONDOWN:
+        return 0;
+    case WM_MBUTTONUP:
+        if (!editing && !leaving) { // middle-click gesture on desktop pill: toggle Play/Pause if playing media, else Boost RAM
+            if (model.hasTrack) model.media.PlayPause();
+            else model.BoostRam();
+            Poke();
+        }
+        return 0;
     case WM_RBUTTONUP:
         if (studio) input.rclick = true, Poke();
         if (!editing && !leaving && onEdit) onEdit(); // press and hold on a phone; here a right click

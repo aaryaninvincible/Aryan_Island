@@ -260,10 +260,14 @@ public:
     int brightPct = -1; // -1 hides brightness slider
 
     bool awake = false;
-    int look = 2; // appearance picked: 0 dark, 1 light, 2 glass (default), 3 custom, 4 follow halobar, 5 starfall; Look() is what's drawn
+    int look = 2; // appearance picked: 0 dark, 1 light, 2 glass (default), 3 custom, 4 follow halobar, 5 starfall, 6 clear, 7 cyber, 8 aurora, 9 oled
     static constexpr int kLookHalo = 4;
     static constexpr int kLookStarfall = 5; // ours alone: halobar wears it only by following us, and never hands it back
     static constexpr int kLookClear = 6; // picked under glass: the resting pill is only ink, the panel glass on the wallpaper's side
+    static constexpr int kLookCyber = 7; // cyberpunk neon obsidian
+    static constexpr int kLookAurora = 8; // northern-lights frosted starlight glass
+    static constexpr int kLookOled = 9; // true pitch-black AMOLED
+    static constexpr int kLookMax = 9;
     struct Halo { // halobar's own theme, read only while following it
         int look = -1; // -1 it follows us back, else 0..3 or clear, like ours
         int glassTint = -1;
@@ -287,7 +291,7 @@ public:
     std::wstring ThemeKey(const wchar_t* key) const; // where this value is saved, for the theme that's live
     int glassTint = -1; // glass: its tint, 0xRRGGBB; -1 the plain dark one
     int GlassTint() const { return Following() ? halo.glassTint : glassTint; }
-    bool Glassy() const { int l = Look(); return l == 2 || l == kLookClear; } // the look draws on the live blur
+    bool Glassy() const { int l = Look(); return l == 2 || l == kLookClear || l == kLookAurora; } // the look draws on the live blur
     int edge = 0; // 0 top (default), 1 left, 2 right: the user's pick
     int haloEdge = -1; // the edge halobar's dock holds, in our numbering; -1 none (bottom, or not running)
     int haloReach = 0; // pixels its bottom dock rises from the screen's bottom, 0 when it isn't there: the sidebar ends above it
@@ -381,7 +385,13 @@ public:
     static const wchar_t* PageName(int id);
     static const wchar_t* PageAbout(int id);
     static int PageGlyph(int id);
-    enum ToolTile { kTlSnip, kTlColor, kTlAwake, kTlAlerts, kTlDnd, kTlSaver, kTlAir, kTlSettings, kTlWork, kTlLang, kTlBin, kTlUpdates, kToolTiles }; // new ones go last: saved lists keep their meaning // the tools page's quick tiles
+    enum ToolTile { kTlSnip, kTlColor, kTlAwake, kTlAlerts, kTlDnd, kTlSaver, kTlAir, kTlSettings, kTlWork, kTlLang, kTlBin, kTlUpdates, kTlRamClean, kToolTiles }; // new ones go last: saved lists keep their meaning // the tools page's quick tiles
+    sys::extras::RamCleanResult lastRamClean{};
+    ULONGLONG lastRamCleanTick = 0;
+    int autoRamClean = 1; // auto-boost RAM when memory usage exceeds 85%
+    bool ramAutoCleaned = false; // set when background auto-clean triggers so main/drawer can peek
+    int procSortByRam = 0; // 0 sort top processes by CPU, 1 sort by Memory (RAM)
+    sys::extras::RamCleanResult BoostRam(); // trims background working sets and updates live memory stats
     std::vector<int> tiles; // the ones shown, in order, may be empty
     bool TileHere(int id) const { return id == kTlWork ? tiler != sys::Tiler::kNone : id != kTlAwake || portable; } // keeping the screen awake is for laptops, workspaces for a pc with a tiling manager
     void CheckTiler(); // installed or removed since the last look: the tile, pill word and dashboard tile come and go with it

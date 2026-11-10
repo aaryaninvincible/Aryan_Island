@@ -4,6 +4,7 @@
 #include <ws2tcpip.h>
 #include <iphlpapi.h>
 #include <icmpapi.h>
+#include <psapi.h>
 #include <shellapi.h>
 #include <winhttp.h>
 #include <wuapi.h>
@@ -172,6 +173,45 @@ BinInfo Bin() {
 }
 
 void EmptyBin(HWND owner) { SHEmptyRecycleBinW(owner, nullptr, 0); } // no flags: windows' own "are you sure"
+
+RamCleanResult CleanRam() {
+    RamCleanResult res{};
+    MEMORYSTATUSEX before{sizeof(before)}, after{sizeof(before)};
+    GlobalMemoryStatusEx(&before);
+    res.beforePct = (int)before.dwMemoryLoad;
+
+    DWORD pids[4096] = {}, needed = 0;
+    DWORD selfPid = GetCurrentProcessId();
+    uint64_t trimmedBytesEst = 0;
+    if (K32EnumProcesses(pids, sizeof(pids), &needed)) {
+        DWORD count = needed / sizeof(DWORD);
+        for (DWORD i = 0; i < count; ++i) {
+            if (pids[i] == 0 || pids[i] == 4 || pids[i] == selfPid) continue;
+            HANDLE h = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION | PROCESS_SET_QUOTA, FALSE, pids[i]);
+            if (!h) continue;
+            PROCESS_MEMORY_COUNTERS pmc{sizeof(pmc)};
+            SIZE_T wsBefore = K32GetProcessMemoryInfo(h, &pmc, sizeof(pmc)) ? pmc.WorkingSetSize : 0;
+            if (K32EmptyWorkingSet(h) || SetProcessWorkingSetSize(h, (SIZE_T)-1, (SIZE_T)-1)) {
+                ++res.procsTrimmed;
+                if (wsBefore > 0 && K32GetProcessMemoryInfo(h, &pmc, sizeof(pmc)) && wsBefore > pmc.WorkingSetSize)
+                    trimmedBytesEst += (wsBefore - pmc.WorkingSetSize);
+            }
+            CloseHandle(h);
+        }
+    }
+
+    GlobalMemoryStatusEx(&after);
+    res.afterPct = (int)after.dwMemoryLoad;
+    res.totalGb = (double)after.ullTotalPhys / (1024.0 * 1024.0 * 1024.0);
+    res.usedAfterGb = (double)(after.ullTotalPhys - after.ullAvailPhys) / (1024.0 * 1024.0 * 1024.0);
+    double sysDeltaMb = after.ullAvailPhys > before.ullAvailPhys ? (double)(after.ullAvailPhys - before.ullAvailPhys) / (1024.0 * 1024.0) : 0.0;
+    double estMb = (double)trimmedBytesEst / (1024.0 * 1024.0);
+    res.freedMb = (std::max)(sysDeltaMb, estMb * 0.65);
+    if (res.freedMb < 1.0 && res.procsTrimmed > 0) res.freedMb = (double)res.procsTrimmed * 1.5;
+    if (res.afterPct >= res.beforePct && res.freedMb > 32.0 && res.totalGb > 0)
+        res.afterPct = (std::max)(1, res.beforePct - (int)std::lround((res.freedMb / 1024.0) / res.totalGb * 100.0));
+    return res;
+}
 
 struct Updates::Impl {
     mutable std::mutex mu;

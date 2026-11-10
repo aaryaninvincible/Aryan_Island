@@ -262,7 +262,7 @@ private:
     float clearInk = 0, clearInkGoal = 0; // clear's resting pill: 0 white .. 1 black, eased
     int inkTick = 0; // seconds toward its next look
     bool Clear() const { return lookNow == Model::kLookClear; }
-    bool Frosted() const { return lookNow == 2 || Clear(); } // drawn on the live blur
+    bool Frosted() const { return lookNow == 2 || Clear() || lookNow == Model::kLookAurora; } // drawn on the live blur
     bool ClearPill() const { return Clear() && islandLook && !peeking; } // no body at all: only the ink. a peek brings words to read: glass
     Color Tint(float k) const; // what keeps the ink readable where the page fights it: smoke, or frost, in the tint's color
     float TintFor(float lum) const; // how much of it, over a page this bright
@@ -333,7 +333,7 @@ private:
     D2D1_MATRIX_3X2_F shapeXform = D2D1::Matrix3x2F::Identity(); // this frame's shape placement, the glass mask reuses it
     std::wstring peekTitle, peekDetail;
     int peekIcon = 0;
-    float dragOff = 0, dragY0 = 0, dragY = 0, dragVel = 0, pressTo = 0; // drag state, vel for fling
+    float dragOff = 0, dragY0 = 0, dragY = 0, dragX0 = 0, dragX = 0, dragVel = 0, pressTo = 0; // drag state, vel for fling
     double dragT = 0;
 
     Input input;

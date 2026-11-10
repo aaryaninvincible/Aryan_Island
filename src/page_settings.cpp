@@ -34,10 +34,10 @@ constexpr float kLyricsRow = 112; // the motion card, a shorter row
 constexpr float kNoteLines = 44; // three short lines of a note beside a small picture
 constexpr float kDndW = 44; // the do not disturb pill in the notifications card
 constexpr float kDeskRowH = 30; // the island card's desktop switch
-constexpr int kSwatchCols = 3; // material swatches per row
+constexpr int kSwatchCols = 4; // material swatches per row
 constexpr float kSwatchStars = 6; // star density in the starfall swatch, the panel's is 1
 constexpr double kWheelHold = 0.4; // seconds the page keeps the wheel after it scrolled
-constexpr float kSwatchGap = 10;
+constexpr float kSwatchGap = 8;
 float Rad(float deg) { return deg * kPi / 180; }
 
 int ToHex(Color c) {
@@ -388,26 +388,29 @@ void Swatch(Canvas& c, const Theme& look, D2D1_RECT_F q, bool glassy, float hue,
     c.StrokeV(q, 12, look.hairTop, look.hairBot, 1);
 }
 
-void Material(PageCtx& p, const D2D1_RECT_F& r, bool live) { // six swatches drawn in the actual materials, halobar's in whatever it wears
+void Material(PageCtx& p, const D2D1_RECT_F& r, bool live) { // swatches drawn in the actual materials, halobar's in whatever it wears
     Ui& ui = p.ui;
     Canvas& c = ui.C();
     const Theme& t = p.shell;
     Model& m = p.m;
     D2D1_RECT_F in = Box(c, t, r, L"Material");
-    bool glass = m.look == 2 || m.look == Model::kLookClear;
+    bool glass = m.look == 2 || m.look == Model::kLookClear || m.look == Model::kLookAurora;
     int picked = m.look == Model::kLookClear ? 2 : m.look; // clear lives under glass, in the card below
     Seed s = Base(m, t);
     constexpr float extra = kSlideH + 6; // room for the blur slider, or the opacity slider on the solid looks
-    float sw = (Width(in) - 2 * kSwatchGap) / kSwatchCols, sh = (std::min)((Height(in) - extra - 2 * 18 - 6) / 2, sw * 0.62f); // three, then the rest, a label under each
-    static const wchar_t* const kNames[] = {L"Dark", L"Light", L"Glass", L"Custom", L"HaloBar", L"Starfall"};
-    int order[Model::kLookStarfall + 1], looks = 0;
-    for (int k = 0; k <= Model::kLookStarfall; ++k)
-        if (k != Model::kLookHalo || !m.halo.FollowsUs() || m.look == Model::kLookHalo) order[looks++] = k; // halobar following us: no swatch to follow it back, unless already picked
+    float sw = (Width(in) - (kSwatchCols - 1) * kSwatchGap) / kSwatchCols, sh = (std::min)((Height(in) - extra - 2 * 18 - 6) / 2, sw * 0.68f);
+    static const wchar_t* const kNames[] = {L"Dark", L"Light", L"Glass", L"Custom", L"HaloBar", L"Starfall", L"Clear", L"Cyber", L"Aurora", L"OLED"};
+    int order[Model::kLookMax + 1], looks = 0;
+    for (int k = 0; k <= Model::kLookMax; ++k) {
+        if (k == Model::kLookClear) continue; // clear is selected inside the Glass card
+        if (k == Model::kLookHalo && (!m.halo.here || m.halo.FollowsUs()) && m.look != Model::kLookHalo) continue;
+        order[looks++] = k;
+    }
     for (int at = 0; at < looks; ++at) {
         int i = order[at];
         int row = at / kSwatchCols, col = at % kSwatchCols, inRow = (std::min)(kSwatchCols, looks - row * kSwatchCols);
-        float x0 = in.left + (kSwatchCols - inRow) * (sw + kSwatchGap) / 2; // a shorter second row sits centered
-        D2D1_RECT_F q = Rect(x0 + col * (sw + kSwatchGap), in.top + 2 + row * (sh + 24), sw, sh);
+        float x0 = in.left + (kSwatchCols - inRow) * (sw + kSwatchGap) / 2; // a shorter row sits centered
+        D2D1_RECT_F q = Rect(x0 + col * (sw + kSwatchGap), in.top + 2 + row * (sh + 22), sw, sh);
         uint32_t id = Ui::Id("set.mat", i);
         Ui::Hit h = live ? ui.Button(id, q) : Ui::Hit{};
         float on = ui.Smooth(id + 10, picked == i ? 1.0f : 0, 14), hov = ui.Smooth(id + 20, h.hover ? 1.0f : 0, 16);
@@ -423,7 +426,7 @@ void Material(PageCtx& p, const D2D1_RECT_F& r, bool live) { // six swatches dra
         if (on > 0.01f) c.Glow({(q.left + q.right) / 2, (q.top + q.bottom) / 2}, sw, sh, t.accent.Alpha(0.20f * on));
         Swatch(c, look, q, mat == 2 || mat == Model::kLookClear, seed.hue, sw, sh);
         if (on > 0.01f || hov > 0.01f) c.Stroke(Inset(q, -3, -3), 14, t.accent.Alpha((std::max)(on, 0.5f * hov)), 2);
-        c.Text(kNames[i], Rect(q.left - 4, q.bottom + 3, Width(q) + 8, 14), Weight::Medium, 11, t.textDim.Mix(t.text, on), Align::Center);
+        c.Text(kNames[i], Rect(q.left - 4, q.bottom + 2, Width(q) + 8, 14), Weight::Medium, 10.5f, t.textDim.Mix(t.text, on), Align::Center);
         if (h.clicked && picked != i) {
             if (i == 3 && m.accentMode != 1) m.SetAccent(1, ToHex(t.accent)); // the wheel starts from the accent you're looking at
             m.SetLook(i); // drawer crossfades, glass swaps its pipeline

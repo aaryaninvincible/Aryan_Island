@@ -28,6 +28,9 @@ struct Theme {
 namespace theme {
 constexpr int kStarfall = 5; // the look's number; 4 is taken by following halobar
 constexpr int kClear = 6; // as halobar numbers it: the resting pill is only ink, the panel is glass
+constexpr int kCyber = 7; // cyberpunk neon obsidian with dual-tone electric rims
+constexpr int kAurora = 8; // northern-lights frosted starlight glass
+constexpr int kOled = 9; // pitch-black AMOLED with luminous accent hairlines
 bool TintIsPale(int tint); // that tint wants black ink
 Theme ClearInk(const Theme& t, float dark); // nothing behind it: all one ink, 0 white .. 1 black
 float BmpLuma(IWICBitmapSource* source); // its average brightness, 0..1

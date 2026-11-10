@@ -44,7 +44,7 @@ double GameLen(int sport) { // about how long one lasts, start to finish: for a 
 
 namespace {
 constexpr wchar_t kLookVal[] = L"Appearance";
-constexpr int kLooks = Model::kLookClear + 1; // dark, light, glass, custom, halobar's, starfall, clear
+constexpr int kLooks = Model::kLookMax + 1; // dark, light, glass, custom, halobar's, starfall, clear, cyber, aurora, oled
 constexpr wchar_t kQuietVal[] = L"Quiet"; // do not disturb: halobar reads and writes the same value
 constexpr wchar_t kArtBackVal[] = L"MediaArtBg"; // the album art background, shared with halobar the same way
 constexpr wchar_t kVizAlphaVal[] = L"VizAlpha", kVizGainVal[] = L"VizGain"; // the visualizer's opacity over the art and its sensitivity, shared too
@@ -65,7 +65,7 @@ std::vector<std::wstring> SplitLines(const std::wstring& s) {
 }
 
 const wchar_t* const kPageKeys[Model::kPageIds] = {L"home", L"media", L"system", L"network", L"tools", L"shelf", L"widgets"};
-const wchar_t* const kTileKeys[Model::kToolTiles] = {L"screenshot", L"color", L"awake", L"notifications", L"dnd", L"saver", L"airplane", L"settings", L"workspaces", L"language", L"bin", L"updates"};
+const wchar_t* const kTileKeys[Model::kToolTiles] = {L"screenshot", L"color", L"awake", L"notifications", L"dnd", L"saver", L"airplane", L"settings", L"workspaces", L"language", L"bin", L"updates", L"ramclean"};
 constexpr wchar_t kNoneVal[] = L"none"; // every tile taken off: an empty text would read as never set
 
 std::vector<int> ParseList(const std::wstring& s, const wchar_t* const* keys, int n) { // comma separated names; unknown and repeated ones dropped
@@ -159,10 +159,12 @@ Model::Model(const Config& c) : cfg(c), portable(sys::IsPortable()), look(sys::R
     lyricScale = (std::clamp)(sys::ReadNum(L"LyricScale", 100), kLyricMin, kLyricMax);
     bgOpacity = (std::clamp)(sys::ReadNum(L"BgOpacity", kMaxOpacity), kMinOpacity, kMaxOpacity);
     auto appsNum = [](const wchar_t* key, int fallback) { return sys::ReadNum((std::wstring(key) + L"Apps").c_str(), fallback); }; // never set: the desktop's
-    otherSet = {(std::clamp)(appsNum(kLookVal, look), 0, kLookClear), (std::clamp)(appsNum(L"AccentMode", accentMode), 0, (int)kAccentWindows), appsNum(L"AccentHex", accentHex) & 0xFFFFFF,
+    otherSet = {(std::clamp)(appsNum(kLookVal, look), 0, kLookMax), (std::clamp)(appsNum(L"AccentMode", accentMode), 0, (int)kAccentWindows), appsNum(L"AccentHex", accentHex) & 0xFFFFFF,
                 appsNum(L"CustomBg", customBg) & 0xFFFFFF, (std::clamp)(appsNum(L"GlassBlur", glassBlur), 0, 100), (std::clamp)(appsNum(L"BgOpacity", bgOpacity), kMinOpacity, kMaxOpacity),
                 (std::clamp)(appsNum(L"GlassTint", glassTint), -1, 0xFFFFFF)};
     appsTheme = sys::ReadNum(L"AppsTheme", 0) != 0 ? 1 : 0;
+    autoRamClean = flag(L"AutoRamClean", 1);
+    procSortByRam = flag(L"ProcSortByRam", 0);
     pillAlways = flag(L"PillAlways", 0);
     pillFull = flag(L"PillFullscreen", 0);
     pillFullOpen = flag(L"PillFullOpen", 1);
@@ -425,8 +427,13 @@ void Model::Sample(int seconds) {
         lastTotal = t;
     }
     MEMORYSTATUSEX m = {sizeof(m)}; // dwLength must be set first
-    if (GlobalMemoryStatusEx(&m))
+    if (GlobalMemoryStatusEx(&m)) {
         for (int k = 0; k < seconds; ++k) ramHist.Push(m.dwMemoryLoad / 100.0f); // percent -> 0..1
+        if (autoRamClean != 0 && m.dwMemoryLoad >= 85 && GetTickCount64() - lastRamCleanTick > 300000) {
+            BoostRam();
+            ramAutoCleaned = true;
+        }
+    }
     static int netInfo = 0; // the adapter and the wi-fi name: every second while the panel shows them, else every ten
     net = netSrc.Sample(panelLive || ++netInfo % 10 == 0); // rates are averaged over the gap by the sampler's own clock
     for (int k = 0; k < seconds; ++k) {
@@ -650,7 +657,18 @@ void Model::SetPages(const std::vector<int>& order) {
 }
 
 std::vector<int> Model::DefaultPages() { return {kPgHome, kPgMedia, kPgSystem, kPgNetwork, kPgShelf, kPgTools}; } // every page, the shelf above the tools
-std::vector<int> Model::DefaultTiles() { return {kTlSnip, kTlColor, kTlAwake, kTlDnd, kTlSettings}; } // the tiles the tools page always had
+std::vector<int> Model::DefaultTiles() { return {kTlRamClean, kTlSnip, kTlColor, kTlAwake, kTlDnd, kTlSettings}; } // the tiles the tools page always had, plus RAM Cleaner
+
+sys::extras::RamCleanResult Model::BoostRam() {
+    lastRamClean = sys::extras::CleanRam();
+    lastRamCleanTick = GetTickCount64();
+    if (lastRamClean.totalGb > 0) {
+        stats.memTotalGb = lastRamClean.totalGb;
+        stats.memUsedGb = lastRamClean.usedAfterGb;
+        stats.mem = lastRamClean.afterPct / 100.0;
+    }
+    return lastRamClean;
+}
 
 void Model::SetTiles(const std::vector<int>& order) {
     tiles = order;
@@ -673,17 +691,17 @@ int Model::PageGlyph(int id) {
 }
 
 const wchar_t* Model::TileName(int id) {
-    static const wchar_t* const kNames[kToolTiles] = {L"Screenshot", L"Color picker", L"Awake", L"Notifications", L"Do not disturb", L"Energy saver", L"Airplane", L"Settings", L"Workspaces", L"Keyboard language", L"Recycle bin", L"Updates"};
+    static const wchar_t* const kNames[kToolTiles] = {L"Screenshot", L"Color picker", L"Awake", L"Notifications", L"Do not disturb", L"Energy saver", L"Airplane", L"Settings", L"Workspaces", L"Keyboard language", L"Recycle bin", L"Updates", L"Boost RAM"};
     return kNames[(std::clamp)(id, 0, kToolTiles - 1)];
 }
 
 const wchar_t* Model::TileAbout(int id) {
-    static const wchar_t* const kAbout[kToolTiles] = {L"Pick a region of the screen", L"Pick a color from the screen", L"Keep the screen on", L"Open the notification list", L"Silence notifications", L"Turn energy saver on or off", L"Turn every radio off", L"Aryan Island' settings", L"Switch between workspaces", L"Switch keyboard language", L"See and empty the bin", L"Check for updates"};
+    static const wchar_t* const kAbout[kToolTiles] = {L"Pick a region of the screen", L"Pick a color from the screen", L"Keep the screen on", L"Open the notification list", L"Silence notifications", L"Turn energy saver on or off", L"Turn every radio off", L"Aryan Island' settings", L"Switch between workspaces", L"Switch keyboard language", L"See and empty the bin", L"Check for updates", L"Free unused RAM from background apps"};
     return kAbout[(std::clamp)(id, 0, kToolTiles - 1)];
 }
 
 int Model::TileGlyph(int id) {
-    static const int kGlyphs[kToolTiles] = {glyph::Snip, glyph::Edit, glyph::Coffee, glyph::Bell, glyph::Dnd, glyph::Saver, glyph::Airplane, glyph::Settings, glyph::Workspaces, glyph::Translate, glyph::Delete, glyph::Update};
+    static const int kGlyphs[kToolTiles] = {glyph::Snip, glyph::Edit, glyph::Coffee, glyph::Bell, glyph::Dnd, glyph::Saver, glyph::Airplane, glyph::Settings, glyph::Workspaces, glyph::Translate, glyph::Delete, glyph::Update, glyph::Rocket};
     return kGlyphs[(std::clamp)(id, 0, kToolTiles - 1)];
 }
 
